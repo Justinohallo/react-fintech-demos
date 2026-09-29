@@ -69,8 +69,8 @@ The score is the checks and items passed, out of their total. Every mock scores 
 | `/challenges/NN` | TS | Challenge brief (§4). |
 | `/challenges/NN/mock` | TS | The reference implementation, full-bleed, no app chrome except a small floating "← Brief" link in a corner. |
 | `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. When the attempt has a review, its score (`4/10 ACs · 5/8 a11y`) and a link to it. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
-| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time, each linking to the guides that address it. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
-| `/progress/NN/N` | TS | One review, rendered. |
+| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time, each linking to the guides that address it. The code rubric by rep, one row per dimension, and comment counts by category and severity. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
+| `/progress/NN/N` | TS | One review, rendered, then its code review: the rubric, and the attempt's `page.jsx` with line numbers and each comment shown under the lines it refers to. |
 | `/guides` | TS | The curriculum: every guide, grouped by unit in unit order, each with its title and summary. Linked from every page header. Reads `guides/` at build time. |
 | `/guides/<slug>` | TS | One guide, rendered, with links to the previous and next guide in the curriculum. |
 | `/challenges/NN/deliverable/attempt-N` | **JSX** | An attempt. Its layout (TS) supplies only the floating timer and a "← Attempts" link. The page itself is the human's. |
@@ -205,8 +205,8 @@ The review writes one row per rep, replacing that rep's row if it is reviewed ag
 
 1. Run `npm run check -- NN N`.
 2. Read the attempt's `page.jsx` and `notes.md`, the challenge's section of `CHALLENGES.md`, §5 of this spec, and every earlier review in `reviews/`.
-3. Write `reviews/NN/attempt-N.md` in the format below, and the rep's `REPS.md` row.
-4. Commit both with a message starting `Review NN attempt N:` and the score.
+3. Write `reviews/NN/attempt-N.md` in the format below, the code review `reviews/NN/attempt-N.code.md`, and the rep's `REPS.md` row.
+4. Commit them with a message starting `Review NN attempt N:` and the score.
 
 Front matter, one `key: value` per line, so the site can read it without a YAML parser:
 
@@ -255,6 +255,43 @@ Sections, in order:
 | `a11y-item-skipped` | A challenge accessibility item was not attempted |
 | `focus-management` | Focus lost, not moved, or not returned |
 
+**Code review (`reviews/NN/attempt-N.code.md`).** Written by the review alongside the rep review. It reviews the attempt's code as a senior engineer would review a pull request: component structure, props and data flow, Tailwind usage, correctness, naming, React idioms and markup.
+
+Front matter: one rubric score per dimension, 0 to 3.
+
+```
+---
+structure: 1
+data_flow: 1
+styling: 1
+correctness: 0
+naming: 2
+idioms: 2
+markup: 2
+---
+```
+
+| Score | Meaning |
+|---|---|
+| 0 | Missing, or wrong in a way that breaks the result |
+| 1 | Works in places, with must-fix problems |
+| 2 | Sound, with should-fix problems |
+| 3 | Idiomatic; nits at most |
+
+Body: one comment per `###` heading, anchored to lines of `page.jsx`, with a severity and a category:
+
+```
+### page.jsx:24-29 · should · structure
+The Card is told which heading level to use (`isPrimary`) because it doesn't own its content. …
+Guide: [Composing components](/guides/composing-components)
+```
+
+- **Severity:** `must` (breaks an AC, a check, or correctness), `should` (a real cost, named in the comment), `nit` (preference), `good` (worth keeping).
+- **Category**, one per dimension: `structure`, `data_flow`, `styling`, `correctness`, `naming`, `idioms`, `markup`.
+- **Discussion.** The human replies in Claude Code. The Coach adds the exchange under the comment as lines starting `**You:**` and `**Coach:**`, and changes the comment or its severity if the discussion changes the verdict.
+
+Comments follow the attempt's line order. A review's Next rep may draw on the code review, but the two are scored separately.
+
 **Guides (`guides/<slug>.md`).** The curriculum. It grows over time: adding a guide is adding a file. Front matter, one `key: value` per line:
 
 ```
@@ -269,8 +306,9 @@ worksheet: tokens
 ---
 ```
 
-- `unit` groups guides; `unit_order` orders units; `order` orders guides within a unit. Units are Analysis, Layout, Data and state, Interaction, and Accessibility, and more may be added.
+- `unit` groups guides; `unit_order` orders units; `order` orders guides within a unit. Units are Analysis, Layout, Data and state, Interaction, Accessibility, and Code craft, and more may be added.
 - `addresses` lists the issue tags (above) the guide helps fix. `/progress` links each tag to its guides.
+- `code` (optional) lists the code review categories the guide teaches. Code comments in those categories may link it.
 - `worksheet` (optional) names the §5 worksheet step the guide expands: `regions`, `tokens`, `data`, `state`, `states`, or `questions`. `/framework` links that step to it.
 - The body is Markdown: `##` sections, lists, tables and code. Examples are invented; a guide never contains a challenge's reference analysis, tokens, layout or data.
 
@@ -304,6 +342,7 @@ worksheet: tokens
 | T-1.3 | Rep reviews: the check script saves attempt results, the `/review` command, review scores and links on attempt indexes, `/progress` and `/progress/NN/N`, a Progress link in the page header; backfill the review of challenge 01 attempt 1 | T-1.2 |
 | T-1.4 | Guides: `/guides` and `/guides/<slug>`, a Guides link in the page header, worksheet links on `/framework`, guide links beside recurring issues on `/progress`, the `/guide` command; first guides "The 5-minute read" and "Reading tokens" | T-1.3 |
 | T-1.5 | Notes scaffolding: guided, prompted and bare notes templates, level selection and `--notes=` in the attempt script, the attempt index and `/review` read the new structure | T-1.4 |
+| T-1.6 | Code review: the code review format read by the site, annotated source and rubric on `/progress/NN/N`, rubric and category counts on `/progress`, `/review` writes it; Code craft guides "Composing components", "Props and money" and "Tailwind utilities that bite"; backfill code reviews of challenge 01 attempts 1 and 2 | T-1.5 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 
