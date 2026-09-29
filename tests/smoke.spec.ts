@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { UNIVERSAL_A11Y } from "../src/content/a11y";
 import { challenges } from "../src/content/challenges";
 import {
   TIER_NAMES,
@@ -44,6 +45,9 @@ test.describe("every route returns 200 and renders its heading", () => {
       await expect(page.getByRole("heading", { level: 1, name: c.title })).toBeVisible();
       await expect(page.getByRole("navigation", { name: "Site" }).getByRole("link", { name: "Framework" })).toBeVisible();
       for (const ac of c.acceptanceCriteria) await expect(page.getByText(ac.id, { exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Accessibility bonus" })).toBeVisible();
+      for (const item of [...UNIVERSAL_A11Y, ...c.a11yBonus])
+        await expect(page.getByText(item.id, { exact: true })).toBeVisible();
     });
 
     test(`${base}/mock`, async ({ page }) => {

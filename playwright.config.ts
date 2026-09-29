@@ -20,6 +20,12 @@ export default defineConfig({
       testMatch: "challenges/*.spec.ts",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
     },
+    // Universal accessibility bonus checks (SPEC.md §2), run by `check` beside the AC suite.
+    {
+      name: "a11y",
+      testMatch: "a11y.spec.ts",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 }, contextOptions: { reducedMotion: "reduce" } },
+    },
     // Mock screenshots at 375, 768 and 1280 (SPEC.md §7). Not part of `check`.
     { name: "screenshots", testMatch: "screenshots/*.spec.ts", use: { ...devices["Desktop Chrome"] } },
   ],

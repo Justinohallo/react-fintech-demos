@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // npm run check -- NN        grades challenge NN's mock
 // npm run check -- NN N      grades attempt N of challenge NN
-// Runs tests/challenges/NN.spec.ts with KESTREL_BASE_PATH pointing at the
-// target, then prints pass/fail per AC ID. Plain Node, no dependencies.
+// Runs tests/challenges/NN.spec.ts and tests/a11y.spec.ts with KESTREL_BASE_PATH
+// pointing at the target, then prints pass/fail per AC ID, the accessibility
+// bonus, and a score line. Only ACs affect the exit code. Plain Node.
 
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -42,9 +43,11 @@ if (nArg !== undefined) {
 const jsonOut = path.join(os.tmpdir(), `kestrel-check-${nn}-${process.pid}.json`);
 console.log(`Challenge ${nn} · ${target} · ${basePath}\n`);
 
-const run = spawnSync(
+// Exit status comes from the AC results below, not from Playwright: a failing
+// accessibility check must not fail the run.
+spawnSync(
   "npx",
-  ["playwright", "test", spec, "--project=challenges", "--reporter=line,json"],
+  ["playwright", "test", spec, "tests/a11y.spec.ts", "--project=challenges", "--project=a11y", "--reporter=line,json"],
   {
     cwd: root,
     stdio: "inherit",
@@ -84,20 +87,35 @@ const acs = [...content.matchAll(/id: "(C(\d\d)-AC\d+)",\s*text: "(?:[^"\\]|\\.)
   .map((m) => ({ id: m[1], manual: m[3] === "true" }));
 if (acs.length === 0) fail(`No acceptance criteria found for challenge ${nn} in src/content/challenges.ts`);
 const tested = (id) => results.some((r) => r.title === id || r.title.startsWith(`${id} `));
+const isAc = (r) => /^C\d\d-AC\d+/.test(r.title);
+const isA11y = (r) => /^(A11Y-\d+|C\d\d-A11Y\d+)\b/.test(r.title);
+
+// Accessibility bonus: universal checks from src/content/a11y.ts, plus the
+// challenge's own items from challenges.ts. An item with no test scores 0.
+const universal = [...fs.readFileSync(path.join(root, "src/content/a11y.ts"), "utf8").matchAll(/id: "(A11Y-\d+)"/g)].map((m) => m[1]);
+const items = [...content.matchAll(/id: "(C(\d\d)-A11Y\d+)"/g)].filter((m) => m[2] === nn).map((m) => m[1]);
+const a11yIds = [...universal, ...items];
 const manual = acs.filter((a) => a.manual).map((a) => a.id);
 const missing = acs.filter((a) => !a.manual && !tested(a.id)).map((a) => a.id);
 
 const byId = (a, b) => a.title.localeCompare(b.title, "en", { numeric: true });
 console.log("\nAcceptance criteria");
-for (const r of results.sort(byId)) console.log(`  ${r.status}    ${r.title}`);
+for (const r of results.filter(isAc).sort(byId)) console.log(`  ${r.status}    ${r.title}`);
 for (const id of missing) console.log(`  MISSING ${id}   (no test titled with this ID)`);
 for (const id of manual) console.log(`  MANUAL  ${id}`);
 
+console.log("\nAccessibility bonus");
+for (const r of results.filter(isA11y).sort(byId)) console.log(`  ${r.status}    ${r.title}`);
+const a11yMissing = a11yIds.filter((id) => !tested(id));
+for (const id of a11yMissing) console.log(`  MISSING ${id}   (no test titled with this ID)`);
+
 const graded = acs.length - manual.length;
-const passed = results.filter((r) => r.status === "PASS" && /^C\d\d-AC\d+/.test(r.title)).length;
+const passed = results.filter((r) => r.status === "PASS" && isAc(r)).length;
+const a11yPassed = results.filter((r) => r.status === "PASS" && isA11y(r)).length;
 console.log(
-  `\n${passed}/${graded} ACs passed` +
-    (missing.length ? `, ${missing.length} missing` : "") +
-    (manual.length ? `, ${manual.length} manual` : ""),
+  `\n${passed}/${graded} ACs · ${a11yPassed}/${a11yIds.length} a11y` +
+    (missing.length ? ` · ${missing.length} ACs missing` : "") +
+    (manual.length ? ` · ${manual.length} manual` : ""),
 );
-process.exit(run.status === 0 && passed === graded ? 0 : 1);
+// Only ACs decide the exit code; the accessibility bonus never fails a rep.
+process.exit(passed === graded ? 0 : 1);
