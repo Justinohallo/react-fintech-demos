@@ -12,9 +12,9 @@ A public site on Vercel where a timed rep runs end to end:
 4. Start the timer.
 5. Build an attempt in `.jsx`.
 6. Grade it against the same acceptance suite that grades the reference.
-7. Log the rep.
+7. Review the rep: `/review NN N` grades it, writes a review, and logs it.
 
-Attempts persist and deploy, so progress is visible over time. It must be usable tonight and support about twenty reps over two weeks.
+Attempts and their reviews persist and deploy, so progress is visible over time on `/progress`. It must be usable tonight and support about twenty reps over two weeks.
 
 ## 2. Stack
 
@@ -68,7 +68,9 @@ The score is the checks and items passed, out of their total. Every mock scores 
 | `/framework` | TS | The method (§5). Readable in two minutes. Linked from every page header. |
 | `/challenges/NN` | TS | Challenge brief (§4). |
 | `/challenges/NN/mock` | TS | The reference implementation, full-bleed, no app chrome except a small floating "← Brief" link in a corner. |
-| `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
+| `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. When the attempt has a review, its score (`4/10 ACs · 5/8 a11y`) and a link to it. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
+| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
+| `/progress/NN/N` | TS | One review, rendered. |
 | `/challenges/NN/deliverable/attempt-N` | **JSX** | An attempt. Its layout (TS) supplies only the floating timer and a "← Attempts" link. The page itself is the human's. |
 
 `NN` is zero-padded, `01`–`10`. Use static folders per challenge, not a dynamic segment, so attempt folders can sit under them.
@@ -174,12 +176,68 @@ The page template is a single `'use client'` component. It has an empty `<main>`
 
 **Check script (`npm run check -- NN [N]`).** Runs `tests/challenges/NN.spec.ts` and `tests/a11y.spec.ts` with a base-path variable pointing at `/challenges/NN/mock`, or at `/challenges/NN/deliverable/attempt-N` when N is given. Prints pass/fail per AC ID, then the accessibility bonus per item, then one score line, e.g. `10/10 ACs · 7/8 a11y`. Only ACs affect the exit code.
 
+When N is given, the check script also saves the result to `reviews/NN/attempt-N.check.json`: timestamp, and status per AC and accessibility ID. A later run overwrites it.
+
 **`REPS.md`.** At the repository root. A table with columns:
 
 | Date | Challenge | Attempt | Minutes | Phase at 60 | ACs passed | A11y | Top lookup |
 |---|---|---|---|---|---|---|---|
 
-The human fills it in. The Builder only creates the header.
+The review writes one row per rep, replacing that rep's row if it is reviewed again. The human may edit any row.
+
+**Review (`/review NN N`).** A Claude Code command, run after every rep, in the Coach seat (`CLAUDE.md`).
+
+1. Run `npm run check -- NN N`.
+2. Read the attempt's `page.jsx` and `notes.md`, the challenge's section of `CHALLENGES.md`, §5 of this spec, and every earlier review in `reviews/`.
+3. Write `reviews/NN/attempt-N.md` in the format below, and the rep's `REPS.md` row.
+4. Commit both with a message starting `Review NN attempt N:` and the score.
+
+Front matter, one `key: value` per line, so the site can read it without a YAML parser:
+
+```
+---
+challenge: 01
+attempt: 1
+date: 2026-09-29
+minutes: 60
+phase: Components and data
+acs: 4/10
+a11y: 5/8
+analysis_minutes: 12
+tags: hard-coded-data, analysis-overrun, missing-tier
+focus: Read the Requirements before the mock | Open the data file in minute one
+---
+```
+
+Sections, in order:
+
+1. **Score**: the check result, one line.
+2. **What landed**: the IDs that passed, grouped by what they show.
+3. **What didn't, and why**: each failed or missing ID with its cause, citing the attempt's lines.
+4. **Against the reference analysis**: tree, tokens, breakpoints, state; which traps were hit.
+5. **Process**: time per phase against §5, from the notes; stalls and lookups.
+6. **Accessibility**: the bonus result and what would raise it.
+7. **Compared with earlier reps**: score trend, and tags that recur. On the first rep: "Baseline."
+8. **Next rep**: at most three focus points, each specific enough to act on in the first ten minutes.
+
+`minutes`, `phase` and `analysis_minutes` come from the notes. Where the notes leave one blank, the review estimates it from the attempt and says so.
+
+**Issue tags.** A review tags only from this list, so recurrence can be counted:
+
+| Tag | Meaning |
+|---|---|
+| `analysis-overrun` | Read and plan ran past 5 minutes |
+| `hard-coded-data` | Values typed into the page that exist in the data file |
+| `missing-derivation` | A derived value missing, wrong, or stored instead of computed |
+| `money-formatting` | Money not in integer cents, or not formatted with `Intl.NumberFormat` |
+| `missing-tier` | A tier's layout was not built |
+| `desktop-first` | Built wide and squeezed down, or used variants outside the standard |
+| `non-semantic-markup` | Headings for size, `div`s for buttons or lists, missing landmarks |
+| `missing-keys` | List items without stable keys |
+| `state-misuse` | Derived values held in state, or effects used to sync state |
+| `interaction-unfinished` | The challenge's core interaction does not work |
+| `a11y-item-skipped` | A challenge accessibility item was not attempted |
+| `focus-management` | Focus lost, not moved, or not returned |
 
 ## 7. Tests
 
@@ -206,6 +264,7 @@ The human fills it in. The Builder only creates the header.
 | T-1 | Scaffold, shell, framework page, timer, attempt and check scripts, content transcription, placeholders, smoke tests | — |
 | T-1.1 | Responsive standard: breakpoints in `globals.css`, shell and `/framework` on the standard, shared responsive test helpers, three-width screenshots | T-1 |
 | T-1.2 | Accessibility bonus: install `@axe-core/playwright` (ADR-002), `tests/a11y.spec.ts`, bonus scoring in the check script, brief pages list the bonus, `REPS.md` A11y column | T-1.1 |
+| T-1.3 | Rep reviews: the check script saves attempt results, the `/review` command, review scores and links on attempt indexes, `/progress` and `/progress/NN/N`, a Progress link in the page header; backfill the review of challenge 01 attempt 1 | T-1.2 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 

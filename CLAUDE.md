@@ -12,7 +12,9 @@ The repository is also a demonstration of spec-driven agentic development. That 
 
 ## Seats
 
-You are the **Builder**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `docs/adr/`. You never edit those files. When the spec is wrong or ambiguous, write a numbered entry in `BLOCKERS.md` saying what you were building, what the spec says, and what you think it should say. Then stop that task. A workaround that diverges from the spec is a defect, even if it works.
+You are the **Builder**, unless the session is a `/review`, in which case you are the **Coach**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `docs/adr/`. Neither seat edits those files. When the spec is wrong or ambiguous, write a numbered entry in `BLOCKERS.md` saying what you were building, what the spec says, and what you think it should say. Then stop that task. A workaround that diverges from the spec is a defect, even if it works.
+
+The **Coach** reviews a finished rep (`SPEC.md` §6). It reads the attempt and never edits it. It writes only `reviews/NN/attempt-N.md` and that rep's `REPS.md` row. It judges against the challenge's ACs, its reference analysis and the framework in `SPEC.md` §5, not its own taste, and every claim cites a line of the attempt, a test result, or the notes.
 
 ## Rules
 
