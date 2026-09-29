@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-09-29T21:04:40.975Z",
+  "challenge": "01",
+  "attempt": 2,
+  "acs": "2/10",
+  "a11y": "4/8",
+  "results": {
+    "C01-AC1": "PASS",
+    "C01-AC2": "FAIL",
+    "C01-AC3": "FAIL",
+    "C01-AC4": "FAIL",
+    "C01-AC5": "FAIL",
+    "C01-AC6": "FAIL",
+    "C01-AC8": "PASS",
+    "C01-AC9": "FAIL",
+    "C01-AC10": "FAIL",
+    "C01-AC11": "FAIL",
+    "C01-A11Y1": "FAIL",
+    "C01-A11Y2": "FAIL",
+    "A11Y-1": "FAIL",
+    "A11Y-2": "FAIL",
+    "A11Y-3": "PASS",
+    "A11Y-4": "PASS",
+    "A11Y-5": "PASS",
+    "A11Y-6": "PASS",
+    "C01-AC7": "MANUAL"
+  }
+}
