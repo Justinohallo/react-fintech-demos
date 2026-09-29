@@ -184,12 +184,12 @@ The page template is a single `'use client'` component. It has an empty `<main>`
 | Prompted | 6–12 | One short prompt per heading; the plan slots; the checkpoint table |
 | Bare | 13 and on | Headings only |
 
-- **Prompts** are Markdown quote lines (`> …`) and may link a guide.
+- **Prompts** are whole italic lines (`_…_`) and may link a guide. Not quote lines: editors continue a `>` line when Enter is pressed, so answers typed under a quote prompt become part of it.
 - **Plan slots** (under the analysis heading): `Started at:` and `Finished at:` (minutes into the rep); `Requirements:` as ACs by kind (layout, data, interaction) plus accessibility items; then one line each for `Regions:`, `Tiers:` (375 · 768 · 1280), `Tokens:`, `Data:`, `State:` and `Questions:`.
 - **Checkpoint table** (under Where time went): the minute each checkpoint was reached against its target: plan written (5), every region at all three tiers (15), all content rendered from data (40), core interaction and states working (50), closing statement given (60).
 - **Self-check** (under What I'd do next, Guided only): Requirements read before the mock; every value from the data file; all three tiers built; `npm run check` run before 60:00. Then the §5 closing statement: done, not done and in what order, and what you'd add before shipping.
 
-When the attempt index and the review read notes, they ignore prompt lines, unfilled slots (a label ending in `:` with nothing after it), unchecked self-check boxes and empty table cells. So a blank never reads as content.
+When the attempt index and the review read notes, they ignore prompt lines (italic lines, and `>` lines matching the template in notes written before this change), unfilled slots (a label ending in `:` with nothing after it), unchecked self-check boxes and empty table cells. So a blank never reads as content.
 **Check script (`npm run check -- NN [N]`).** Runs `tests/challenges/NN.spec.ts` and `tests/a11y.spec.ts` with a base-path variable pointing at `/challenges/NN/mock`, or at `/challenges/NN/deliverable/attempt-N` when N is given. Prints pass/fail per AC ID, then the accessibility bonus per item, then one score line, e.g. `10/10 ACs · 7/8 a11y`. Only ACs affect the exit code.
 
 When N is given, the check script also saves the result to `reviews/NN/attempt-N.check.json`: timestamp, and status per AC and accessibility ID. A later run overwrites it.
