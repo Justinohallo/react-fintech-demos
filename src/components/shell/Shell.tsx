@@ -12,7 +12,10 @@ export function Shell({ children, footer = false }: { children: React.ReactNode;
           <Link href="/" className="font-semibold tracking-tight hover:text-teal-800">
             Kestrel practice set
           </Link>
-          <span className="flex gap-5">
+          <span className="flex gap-4 tablet:gap-5">
+            <Link href="/guides" className="text-stone-600 underline-offset-4 hover:text-teal-800 hover:underline">
+              Guides
+            </Link>
             <Link href="/progress" className="text-stone-600 underline-offset-4 hover:text-teal-800 hover:underline">
               Progress
             </Link>

@@ -125,7 +125,13 @@ export function Markdown({ source }: { source: string }) {
           }
           case "table":
             return (
-              <div key={i} className="relative overflow-x-auto rounded-xl border border-stone-200 bg-white">
+              <div
+                key={i}
+                role="region"
+                aria-label={`Table: ${b.head.join(", ")}`}
+                tabIndex={0}
+                className="relative overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              >
                 <table className="w-full text-left text-sm">
                   <thead className="bg-stone-100 text-stone-600">
                     <tr>
@@ -152,7 +158,13 @@ export function Markdown({ source }: { source: string }) {
             );
           case "code":
             return (
-              <pre key={i} className="overflow-x-auto rounded-xl bg-stone-900 p-4 font-mono text-sm text-stone-100">
+              <pre
+                key={i}
+                role="region"
+                aria-label="Code example"
+                tabIndex={0}
+                className="overflow-x-auto rounded-xl bg-stone-900 p-4 font-mono text-sm text-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              >
                 <code>{b.text}</code>
               </pre>
             );

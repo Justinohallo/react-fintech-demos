@@ -24,7 +24,7 @@ export default function Home() {
                 href={`/challenges/${c.number}`}
                 className="flex items-center gap-4 px-4 py-3 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-teal-600"
               >
-                <span className="w-7 font-mono text-sm text-stone-400">{c.number}</span>
+                <span className="w-7 font-mono text-sm text-stone-500">{c.number}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{c.title}</span>
                   <span className="block truncate text-sm text-stone-500">{c.concept}</span>

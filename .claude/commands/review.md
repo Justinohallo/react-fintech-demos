@@ -16,6 +16,7 @@ Run `npm run check -- NN N`. It saves `reviews/NN/attempt-N.check.json`. Use tha
 - The `## NN —` section of `CHALLENGES.md`: ACs, accessibility items, Responsive list, reference analysis.
 - `tests/challenges/NN.spec.ts`, to explain precisely what a failed test expected.
 - Every earlier review, `reviews/*/attempt-*.md`, for section 7 and for recurring tags.
+- The front matter of every guide in `guides/`, to link the guide behind each focus point.
 
 ## 3. Write `reviews/NN/attempt-N.md`
 
@@ -47,7 +48,7 @@ Then these sections, in order, as `##` headings:
 5. `## Process`: time per phase against §5, from the notes; stalls; lookups.
 6. `## Accessibility`: the bonus result and the specific changes that would raise it.
 7. `## Compared with earlier reps`: the score trend and recurring tags, naming the earlier reviews. On the first review: "Baseline."
-8. `## Next rep`: the same focus points as the front matter, each specific enough to act on in the first ten minutes.
+8. `## Next rep`: the same focus points as the front matter, each specific enough to act on in the first ten minutes. Where a guide addresses the point (its `addresses` or `worksheet`), link it as `[Title](/guides/<slug>)`.
 
 Judge against the ACs, the reference analysis and §5, not your own taste. Every claim cites a line of the attempt, a test result, or the notes. Be direct and specific, and plain about what went well.
 

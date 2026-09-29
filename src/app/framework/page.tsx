@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Shell } from "@/components/shell/Shell";
+import { guidesForStep, type WorksheetStep } from "@/lib/guides";
 
 export const metadata: Metadata = { title: "The method" };
 
@@ -19,7 +21,7 @@ export default function FrameworkPage() {
       <h1 className="text-3xl font-semibold tracking-tight">The method</h1>
 
       <H2>The rep, in five phases</H2>
-      <div className="overflow-x-auto rounded-xl border border-stone-200 bg-white">
+      <div role="region" aria-label="The rep, in five phases" tabIndex={0} className="relative overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-100 text-stone-600">
             <tr>
@@ -45,6 +47,7 @@ export default function FrameworkPage() {
         <li>
           <strong>Regions.</strong> Draw boxes over the image. Name each box as a component. Nest them. That list is
           your file plan.
+          <StepGuides step="regions" />
         </li>
         <li>
           <strong>Tokens.</strong>
@@ -59,18 +62,22 @@ export default function FrameworkPage() {
             </li>
             <li>Map each to a Tailwind value before writing markup.</li>
           </ul>
+          <StepGuides step="tokens" />
         </li>
         <li>
           <strong>Data shape.</strong> What repeats? The repeating thing is an array, and its fields are your props.
           Write the shape before the JSX.
+          <StepGuides step="data" />
         </li>
         <li>
           <strong>State.</strong> What changes when the user acts? Name each piece of state and who owns it. Derive
           everything else.
+          <StepGuides step="state" />
         </li>
         <li>
           <strong>States the image does not show.</strong> Empty, loading, error, overflow, long names, negative
           amounts, zero.
+          <StepGuides step="states" />
         </li>
         <li>
           <strong>Questions to ask out loud.</strong>
@@ -80,6 +87,7 @@ export default function FrameworkPage() {
             <li>Is the data static or should I model it?</li>
             <li>Can I use the platform&rsquo;s native controls?</li>
           </ul>
+          <StepGuides step="questions" />
         </li>
       </ol>
 
@@ -125,4 +133,19 @@ function H2({ children }: { children: React.ReactNode }) {
 
 function Code({ children }: { children: React.ReactNode }) {
   return <code className="rounded bg-stone-100 px-1 py-0.5 font-mono text-[0.85em] text-stone-800">{children}</code>;
+}
+
+/** Links a worksheet step to the guides that expand it (SPEC.md §3). */
+function StepGuides({ step }: { step: WorksheetStep }) {
+  const guides = guidesForStep(step);
+  if (guides.length === 0) return null;
+  return (
+    <span className="mt-1 block text-sm">
+      {guides.map((g) => (
+        <Link key={g.slug} href={`/guides/${g.slug}`} className="mr-4 text-teal-800 underline underline-offset-4 hover:text-teal-950">
+          Guide: {g.title} →
+        </Link>
+      ))}
+    </span>
+  );
 }

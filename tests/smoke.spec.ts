@@ -59,10 +59,31 @@ test.describe("every route returns 200 and renders its heading", () => {
     });
   }
 
+  test("/guides", async ({ page }) => {
+    await visit(page, "/guides");
+    await expect(page.getByRole("heading", { level: 1, name: "Guides" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Site" }).getByRole("link", { name: "Guides" })).toBeVisible();
+    for (const file of fs.readdirSync("guides").filter((f) => f.endsWith(".md"))) {
+      const title = /^title: (.+)$/m.exec(fs.readFileSync(path.join("guides", file), "utf8"))?.[1] ?? file;
+      await expect(page.getByRole("main").getByRole("link", { name: new RegExp(title) })).toHaveCount(1);
+    }
+  });
+
+  // One page per guide file.
+  for (const file of fs.existsSync("guides") ? fs.readdirSync("guides").filter((f) => f.endsWith(".md")) : []) {
+    const route = `/guides/${file.replace(/\.md$/, "")}`;
+    test(route, async ({ page }) => {
+      await visit(page, route);
+      const title = /^title: (.+)$/m.exec(fs.readFileSync(path.join("guides", file), "utf8"))?.[1] ?? "";
+      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    });
+  }
+
   test("/framework", async ({ page }) => {
     await visit(page, "/framework");
     await expect(page.getByRole("heading", { level: 1, name: "The method" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "The rep, in five phases" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Guide: Reading tokens →" })).toBeVisible();
   });
 
   for (const c of challenges) {
@@ -154,7 +175,7 @@ test("the reveal on a brief page requires the confirm step", async ({ page }) =>
 
 // SPEC.md §2: the shell is on the responsive standard too.
 test.describe("shell pages do not scroll horizontally at any tier", () => {
-  const shellRoutes = ["/", "/framework", "/progress", "/challenges/10", "/challenges/10/deliverable"];
+  const shellRoutes = ["/", "/framework", "/progress", "/guides", "/guides/reading-tokens", "/challenges/10", "/challenges/10/deliverable"];
   for (const tier of TIER_NAMES) {
     test(`${tier} ${TIERS[tier].width}px`, async ({ page }) => {
       await setTier(page, tier);

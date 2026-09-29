@@ -4,6 +4,7 @@ import { ProgressChart } from "@/components/progress/ProgressChart";
 import { InlineCode } from "@/components/shell/InlineCode";
 import { Shell } from "@/components/shell/Shell";
 import { REVIEW_TAGS, type ReviewTag } from "@/content/reviewTags";
+import { guidesForTag } from "@/lib/guides";
 import { formatScore, listReviews } from "@/lib/reviews";
 
 export const metadata: Metadata = { title: "Progress" };
@@ -63,7 +64,7 @@ export default function ProgressPage() {
 
           <section className="mt-10">
             <h2 className="text-xl font-semibold tracking-tight">Reps</h2>
-            <div className="mt-4 relative overflow-x-auto rounded-xl border border-stone-200 bg-white">
+            <div role="region" aria-label="Reps" tabIndex={0} className="mt-4 relative overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
               <table className="w-full text-left text-sm">
                 <thead className="bg-stone-100 text-stone-600">
                   <tr>
@@ -109,7 +110,7 @@ export default function ProgressPage() {
             {tags.length === 0 ? (
               <p className="mt-3 text-stone-600">No issues tagged yet.</p>
             ) : (
-              <div className="mt-4 relative overflow-x-auto rounded-xl border border-stone-200 bg-white">
+              <div role="region" aria-label="Recurring issues" tabIndex={0} className="mt-4 relative overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-stone-100 text-stone-600">
                     <tr>
@@ -132,6 +133,15 @@ export default function ProgressPage() {
                           <p className="mt-0.5 text-stone-600">
                             <InlineCode text={REVIEW_TAGS[t]} />
                           </p>
+                          {guidesForTag(t).map((g) => (
+                            <Link
+                              key={g.slug}
+                              href={`/guides/${g.slug}`}
+                              className="mt-1 mr-3 inline-block text-teal-800 underline underline-offset-4 hover:text-teal-950"
+                            >
+                              Read: {g.title}
+                            </Link>
+                          ))}
                         </td>
                         <td className="px-3 py-2 text-right tabular-nums">{recent.get(t) ?? 0}</td>
                         <td className="px-3 py-2 text-right tabular-nums">{allTime.get(t)}</td>
