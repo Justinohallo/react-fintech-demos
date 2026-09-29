@@ -25,6 +25,21 @@ Attempts persist and deploy, so progress is visible over time. It must be usable
 - No other runtime or dev dependencies. No component libraries, icon packages, chart libraries, or state libraries. Icons are inline SVG. Charts are hand-drawn SVG.
 - Deployed on Vercel from `main`.
 
+### Responsive standard
+
+Every page in the set (shell, mocks and attempts) is responsive and mobile-first, on one breakpoint system:
+
+| Tier | Width | Tailwind variant | Test viewport |
+|---|---|---|---|
+| Mobile | 0–767px | none (base styles) | 375×812 |
+| Tablet | 768–1279px | `tablet:` | 768×1024 |
+| Desktop | 1280px and up | `desktop:` | 1280×800 |
+
+- The breakpoints are defined once, in `src/app/globals.css`: `@theme { --breakpoint-*: initial; --breakpoint-tablet: 48rem; --breakpoint-desktop: 80rem; }`. Tailwind's default breakpoints are removed, so `sm:`, `md:`, `lg:`, `xl:` and `2xl:` produce no CSS.
+- Write mobile styles first, then override upward with `tablet:` and `desktop:`. No `max-*` variants and no arbitrary `min-[…]:` queries.
+- No page scrolls horizontally at any test viewport.
+- Each challenge's Layout section has a **Responsive** list saying what changes at each tier, and its ACs grade it.
+
 ## 3. Routes
 
 | Route | Language | Purpose |
@@ -60,7 +75,7 @@ Render this content faithfully. Styling is the Builder's call within the shell's
 | Minutes | Phase | Done when |
 |---|---|---|
 | 0–5 | **Read and plan** | Regions named, component tree said out loud, tokens pulled, questions asked |
-| 5–15 | **Skeleton** | Every region on screen as a box, layout correct at the target width |
+| 5–15 | **Skeleton** | Every region on screen as a box, laid out at all three tiers |
 | 15–40 | **Components and data** | Real content rendered from data, not hard-coded strings |
 | 40–50 | **Interaction and states** | The one core interaction works; hover, focus, empty, error states exist |
 | 50–60 | **Polish and walkthrough** | Largest visual gaps closed; closing statement given |
@@ -73,12 +88,13 @@ Render this content faithfully. Styling is the Builder's call within the shell's
    - Spacing: find the base unit, then check that the gaps are multiples of it.
    - Type: count distinct sizes and weights. It is usually three or four.
    - Radius and shadow.
+   - Breakpoints: what changes at `tablet:` (768) and at `desktop:` (1280)? Name the layout at each tier.
    - Map each to a Tailwind value before writing markup.
 3. **Data shape.** What repeats? The repeating thing is an array, and its fields are your props. Write the shape before the JSX.
 4. **State.** What changes when the user acts? Name each piece of state and who owns it. Derive everything else.
 5. **States the image does not show.** Empty, loading, error, overflow, long names, negative amounts, zero.
 6. **Questions to ask out loud.**
-   - Is this responsive, or fixed width?
+   - What must work at each tier, and what can collapse or hide on mobile?
    - Which interactions matter most?
    - Is the data static or should I model it?
    - Can I use the platform's native controls?
@@ -100,6 +116,8 @@ Say the decision, then the reason. For example: "Grid here because the columns a
 - Pixel-pushing before every region exists.
 - Silence for more than a minute.
 - Storing derived values as state.
+- Building the desktop layout first and squeezing it down.
+- Reaching for `md:` or `lg:`, which produce no CSS in this set.
 
 ## 6. Timer, attempts, rep log
 
@@ -154,15 +172,17 @@ The human fills it in. The Builder only creates the header.
   - one `test()` per AC, titled with its ID, e.g. `C03-AC2 freeze disables reveal`
   - base path comes from the environment variable
   - selectors are role, label and text only (CLAUDE.md)
+  - responsive ACs set the viewport to the tier they grade (375×812, 768×1024, 1280×800) and may measure bounding boxes and scroll width; all other ACs run at 1280×800
   - ACs marked `(manual)` in `CHALLENGES.md` are listed in a comment block at the top of the file, not tested
-- **Screenshots.** Each mock is captured at 1440×900 and 375×812 into `docs/screenshots/NN/`, via a Playwright project that is not part of `check`.
+- **Screenshots.** Each mock is captured at 375×812, 768×1024 and 1280×800 into `docs/screenshots/NN/`, via a Playwright project that is not part of `check`.
 
 ## 8. Tasks
 
 | ID | Task | Depends on |
 |---|---|---|
 | T-1 | Scaffold, shell, framework page, timer, attempt and check scripts, content transcription, placeholders, smoke tests | — |
-| T-2 … T-11 | Mock, data, and AC suite for challenge 01 … 10 (T-n builds challenge n−1) | T-1 |
+| T-1.1 | Responsive standard: breakpoints in `globals.css`, shell and `/framework` on the standard, shared responsive test helpers, three-width screenshots | T-1 |
+| T-2 … T-11 | Mock, data, and AC suite for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.1 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 
 ## 9. Not in scope

@@ -8,7 +8,7 @@ import { RevealAnalysis } from "./RevealAnalysis";
 // SPEC.md §4: header, what this tests, requirements, actions, reference analysis.
 export function ChallengeBrief({ number }: { number: ChallengeNumber }) {
   const c = getChallenge(number);
-  const { tree, tokens, state, traps } = c.referenceAnalysis;
+  const { tree, tokens, breakpoints, state, traps } = c.referenceAnalysis;
 
   return (
     <Shell>
@@ -54,6 +54,9 @@ export function ChallengeBrief({ number }: { number: ChallengeNumber }) {
             </AnalysisItem>
             <AnalysisItem title="Tokens">
               <InlineCode text={tokens} />
+            </AnalysisItem>
+            <AnalysisItem title="Breakpoints">
+              <InlineCode text={breakpoints} />
             </AnalysisItem>
             <AnalysisItem title="State">
               {state.summary && (

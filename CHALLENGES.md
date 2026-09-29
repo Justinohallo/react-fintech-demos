@@ -10,7 +10,7 @@ Ten challenges, rising difficulty, one feature each. Every one is sized for a si
 
 - **Data** lives in `data/NN-<name>.json`. Money is integer minor units (`amountCents`, or `amountSats` for BTC). Dates are ISO strings on or before `2026-09-28`. The mock and the attempt import the same file.
 - **Acceptance criteria** are Given/When/Then with IDs `CNN-ACn`. Each must be testable by role, label, and visible text alone. `(manual)` marks one that a person judges from a screenshot.
-- **Target width** is the design width. A challenge says whether it must also work at 375px.
+- **Responsive.** Every challenge is mobile-first on the three tiers in `SPEC.md` §2 (375, 768, 1280). The Visual direction describes the desktop design. Each Layout section's **Responsive** list says what changes at each tier. Where a challenge gives a max width, it is the desktop content width.
 - **Reference analysis** is what a good 5-minute read of the mock produces. It sits behind the reveal on the brief page.
 - **Fonts** come from `next/font/google`. Colours are given as Tailwind palette names so the token-mapping step has a right answer.
 
@@ -18,7 +18,7 @@ Ten challenges, rising difficulty, one feature each. Every one is sized for a si
 
 ## 01 — Treasury balance
 
-**Difficulty:** 1 · **Concept:** Static layout from data · **Target:** 1280px, fixed
+**Difficulty:** 1 · **Concept:** Static layout from data · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -41,6 +41,12 @@ A top bar with the Kestrel wordmark (plain text), an "Operating account" label, 
 - **Left:** a balance card with the large balance, the month-over-month change as a signed amount and percentage, and a masked account number (`•••• 4821`). Under it, a "Recent activity" card lists 6 transactions: merchant, category, date, and signed amount.
 - **Right:** an "Accounts" card listing 3 accounts (Operating, Payroll, Tax reserve), each with name and balance, and a derived total at the bottom.
 
+**Responsive:**
+
+- **Mobile:** one column, in the order balance card, Accounts, Recent activity. 16px page padding. The top bar drops the "Operating account" label.
+- **Tablet:** the balance card and Accounts side by side (1fr 1fr), with Recent activity full width below. 24px page padding.
+- **Desktop:** the 2fr / 1fr grid above. 32px page padding.
+
 ### Data
 
 `data/01-treasury.json`
@@ -62,21 +68,27 @@ A top bar with the Kestrel wordmark (plain text), an "Operating account" label, 
 - **C01-AC5:** Given a negative transaction, then its amount renders with a leading minus sign, not in parentheses.
 - **C01-AC6:** Given 3 accounts, then the "Accounts" card shows a "Total" equal to the sum of the three balances, formatted as USD.
 - **C01-AC7 (manual):** The two-column split and the serif/sans pairing match the mock.
+- **C01-AC8:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C01-AC9:** Given a 375px viewport, then the balance card, the "Accounts" card and "Recent activity" are stacked in that order.
+- **C01-AC10:** Given a 768px viewport, then the balance card and the "Accounts" card sit side by side, with "Recent activity" below both.
+- **C01-AC11:** Given a 1280px viewport, then "Recent activity" is below the balance card, and the "Accounts" card is to the right of both.
 
 ### Reference analysis
 
 - **Tree:** `TopBar`, `BalanceCard`, `ActivityList > ActivityRow`, `AccountsCard > AccountRow`, `Total`.
 - **Tokens:** `bg-stone-50`, `bg-white`, `border-stone-200`, `rounded-xl`, text `stone-900` / `stone-500`, `emerald-700` / `rose-700`. Spacing base 8: gaps of 24 and 32. Four type sizes: 36 balance, 18 card title, 14 body, 12 meta.
+- **Breakpoints:** one grid whose areas change per tier: `balance / accounts / activity`, then `tablet:` `balance accounts / activity activity`, then `desktop:` `balance accounts / activity accounts` at `2fr 1fr`. Padding `p-4 tablet:p-6 desktop:p-8`.
 - **State:** none. The change, the percentage, and the total are all derived.
 - **Traps:**
   - Formatting with `toFixed` and a hand-placed `$` breaks negatives and separators. Build one `formatUSD` helper first.
   - Dividing by the previous balance without guarding zero.
+  - Rendering the Accounts card twice, once per tier, instead of moving one card with grid areas or `order`.
 
 ---
 
 ## 02 — Plan picker
 
-**Difficulty:** 2 · **Concept:** One piece of state, derived display · **Target:** 1280px, and must stack at 375px
+**Difficulty:** 2 · **Concept:** One piece of state, derived display · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -102,7 +114,11 @@ A centred heading "Plans for every stage" with a subheading. Below it, a Monthly
 - a 5-item feature list with check icons
 - a CTA button
 
-Below 768px the cards stack in one column.
+**Responsive:**
+
+- **Mobile:** one column, with the recommended card first. The segmented control spans the full width.
+- **Tablet:** two columns. The recommended card spans both columns on top; the other two sit side by side below it.
+- **Desktop:** three columns in source order: Starter, Growth, Scale.
 
 ### Data
 
@@ -123,23 +139,28 @@ Below 768px the cards stack in one column.
 - **C02-AC4:** Given a plan with a price of 0, then it shows "Free" instead of "$0", in both periods.
 - **C02-AC5:** Given the recommended plan, then its card contains the text "Recommended".
 - **C02-AC6:** Given each plan, then a button labelled "Choose <plan name>" is present.
-- **C02-AC7:** Given a 375px viewport, then all three plan names are visible after scrolling, with no horizontal page scroll.
+- **C02-AC7:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C02-AC8:** Given a 375px viewport, then the recommended plan's card is first, and all three cards are stacked in one column.
+- **C02-AC9:** Given a 768px viewport, then the recommended plan's card spans the full row above the other two, which sit side by side.
+- **C02-AC10:** Given a 1280px viewport, then the three plan names sit on one row in the order Starter, Growth, Scale.
 
 ### Reference analysis
 
 - **Tree:** `Header`, `PeriodToggle`, `PlanGrid > PlanCard > FeatureList`.
 - **Tokens:** `bg-zinc-950`, `bg-zinc-900`, `border-zinc-800`, `border-lime-400`, `text-zinc-50` / `zinc-400`, `rounded-2xl`. Spacing base 4: card padding 32, gaps 24.
+- **Breakpoints:** `grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3`. The recommended card takes `order-first tablet:col-span-2 desktop:order-none desktop:col-span-1`.
 - **State:** `period: 'monthly' | 'annual'`, owned by the page. The displayed price is `deriveMonthly(plan, period)`.
 - **Traps:**
   - Storing two prices per plan in state.
   - A toggle made of two `div`s with no role. Radio inputs styled as segments give keyboard support for free.
   - Floats creeping in from `* 0.8`. Round once, at render.
+  - Reordering the plans array per tier instead of changing only the CSS.
 
 ---
 
 ## 03 — Card controls
 
-**Difficulty:** 3 · **Concept:** Interdependent toggles, masked data · **Target:** 1024px, fixed
+**Difficulty:** 3 · **Concept:** Interdependent toggles, masked data · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -173,6 +194,12 @@ The right column is a controls panel with:
 
 When frozen, the card face desaturates to grayscale and shows a "Frozen" badge.
 
+**Responsive:**
+
+- **Mobile:** the card face on top at the full content width, up to 340px, keeping its 1.586 aspect ratio. The controls panel below it.
+- **Tablet:** the card face and the controls panel side by side.
+- **Desktop:** the same two columns, centred at 1024px max width with a wider gap.
+
 ### Data
 
 `data/03-card.json`
@@ -192,22 +219,27 @@ When frozen, the card face desaturates to grayscale and shows a "Frozen" badge.
 - **C03-AC5:** Given the freeze control, then it is exposed as a switch named "Freeze card" whose checked state reflects the frozen state.
 - **C03-AC6:** Given spent and limit amounts, then the text "<spent> of <limit>" is shown in USD and a progressbar is present with the matching value.
 - **C03-AC7 (manual):** The card face uses no image files, and the grayscale frozen treatment matches the mock.
+- **C03-AC8:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C03-AC9:** Given a 375px viewport, then "•••• 7314" is above the "Freeze card" switch.
+- **C03-AC10:** Given a 768px or 1280px viewport, then "•••• 7314" is to the left of the "Freeze card" switch.
 
 ### Reference analysis
 
 - **Tree:** `CardFace > (Chip, NetworkMark, Number, Meta)`, `ControlsPanel > (RevealButton, FreezeSwitch, CopyButton, SpendMeter)`.
 - **Tokens:** gradient `from-indigo-600 to-violet-500`, `bg-white/80`, `backdrop-blur`, `shadow-lg`, `rounded-2xl`, `grayscale` filter. Card aspect ratio 1.586.
+- **Breakpoints:** `flex flex-col tablet:flex-row`. The card is `w-full max-w-[340px] aspect-[1.586]`, so it shrinks with its column instead of overflowing.
 - **State:** `revealed`, `frozen`. The invariant: frozen implies not revealed. Enforce it in the freeze handler, not with an effect.
 - **Traps:**
   - Rendering the full number and hiding it with CSS, so it is still in the DOM.
   - A switch that is a checkbox with no `role="switch"`.
   - `useEffect` to un-reveal on freeze, which renders the revealed number for one frame.
+  - Fixing both width and height on the card, so it cannot shrink with its column.
 
 ---
 
 ## 04 — Send a payment
 
-**Difficulty:** 4 · **Concept:** Controlled form, validation, derived summary · **Target:** 1024px, and must work at 375px
+**Difficulty:** 4 · **Concept:** Controlled form, validation, derived summary · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -235,6 +267,12 @@ The heading is "Send a payment". Fields:
 
 A summary box shows amount, fee, total debited, and remaining balance. A "Review payment" submit button follows. On a valid submit, the form is replaced by a confirmation panel reading "Payment scheduled" with the summary and a "Send another" button.
 
+**Responsive:**
+
+- **Mobile:** the panel fills the width with a 16px margin. The two Speed options stack. "Review payment" spans the full width.
+- **Tablet:** the 560px panel, centred. The Speed options sit side by side.
+- **Desktop:** the panel widens to 880px: fields in a left column, the summary box in a right column beside them.
+
 ### Data
 
 `data/04-payment.json`
@@ -256,11 +294,16 @@ A summary box shows amount, fee, total debited, and remaining balance. A "Review
 - **C04-AC5:** When the amount is 0 or not a number, then an error "Enter an amount greater than $0" is shown after the field loses focus.
 - **C04-AC6:** Given a memo, then a counter shows "<n>/140", and the input accepts no more than 140 characters.
 - **C04-AC7:** Given a valid form, when the user submits, then "Payment scheduled" is visible along with the recipient name and total debited, and "Send another" returns an empty form.
+- **C04-AC8:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C04-AC9:** Given a 375px viewport, then the "Instant" option is below the "Standard" option.
+- **C04-AC10:** Given a 768px viewport, then the "Instant" option is to the right of the "Standard" option.
+- **C04-AC11:** Given a 1280px viewport, then the summary's "Total debited" line is to the right of the "Amount" field.
 
 ### Reference analysis
 
 - **Tree:** `PaymentForm > (Field × 4, SpeedRadio, Summary, Submit)`, `Confirmation`.
 - **Tokens:** `border-2 border-neutral-900`, `shadow-[4px_4px_0_var(--color-neutral-900)]`, `rounded-none`, `bg-orange-50`, `text-red-600`. Spacing base 8.
+- **Breakpoints:** panel `max-w-[560px] desktop:max-w-[880px]`, body `grid desktop:grid-cols-[1fr_280px]`, Speed `flex flex-col tablet:flex-row`.
 - **State:**
   - `values` (strings as typed) and `touched` are state.
   - `amountCents`, `feeCents`, `totalCents`, `errors`, and `canSubmit` are all derived.
@@ -275,7 +318,7 @@ A summary box shows amount, fee, total debited, and remaining balance. A "Review
 
 ## 05 — Bitcoin treasury
 
-**Difficulty:** 5 · **Concept:** Unit conversion, denomination toggle, proportional bar · **Target:** 1280px, fixed
+**Difficulty:** 5 · **Concept:** Unit conversion, denomination toggle, proportional bar · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -301,6 +344,12 @@ An allocation bar spans the full width, split into segments for four wallets (Co
 
 A holdings table has columns Wallet, Balance, Share, and 24h. The price line under the header reads "1 BTC = $X · updated 2026-09-28 09:00".
 
+**Responsive:**
+
+- **Mobile:** the KPI tiles stack in one column. The allocation legend is a 2×2 grid. The holdings table shows only Wallet and Balance; Share and 24h are hidden.
+- **Tablet:** the KPI tiles in one row of three, the legend in one row of four, and all four table columns.
+- **Desktop:** the allocation bar and legend sit in a left column beside the holdings table (1fr 2fr).
+
 ### Data
 
 `data/05-treasury.json`
@@ -320,24 +369,30 @@ A holdings table has columns Wallet, Balance, Share, and 24h. The price line und
 - **C05-AC3:** When the user selects "sats", then amounts are whole numbers with thousands separators followed by "sats".
 - **C05-AC4:** Given the 24h prices, then the 24h change tile shows a signed percentage to two decimals. It uses a "▲" glyph for a gain or "▼" for a loss, so colour is not the only signal.
 - **C05-AC5:** Given four wallets, then the allocation legend lists four names, each with a percentage to one decimal, and the percentages sum to 100.0 (±0.1).
-- **C05-AC6:** Given the holdings table, then it is a table with column headers "Wallet", "Balance", "Share", "24h" and four body rows.
+- **C05-AC6:** Given the holdings table at 1280px, then it is a table with column headers "Wallet", "Balance", "Share", "24h" and four body rows.
 - **C05-AC7 (manual):** Allocation segment widths are proportional to balances.
+- **C05-AC8:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C05-AC9:** Given a 375px viewport, then the three KPI tiles are stacked, and the "Share" and "24h" column headers are hidden.
+- **C05-AC10:** Given a 768px viewport, then "Total value", "24h change" and "Cost basis" sit on one row, and all four column headers are visible.
+- **C05-AC11:** Given a 1280px viewport, then the allocation legend is to the left of the holdings table.
 
 ### Reference analysis
 
 - **Tree:** `Header > DenominationToggle`, `KpiRow > KpiTile × 3`, `AllocationBar > (Segment × 4, Legend)`, `HoldingsTable`.
 - **Tokens:** `bg-neutral-950` / `neutral-900`, `border-neutral-800`, `text-amber-400`, `text-green-400` / `red-400`, `rounded-sm`, `font-mono`, `tracking-widest uppercase text-[11px]` labels.
+- **Breakpoints:** KPIs `grid-cols-1 tablet:grid-cols-3`, legend `grid-cols-2 tablet:grid-cols-4`, hidden columns `hidden tablet:table-cell` on both `th` and `td`, page `desktop:grid-cols-[1fr_2fr]`.
 - **State:** `denomination`. Everything else is derived from sats and prices through one `formatAmount(sats, denomination, price)` function.
 - **Traps:**
   - Converting sats to BTC as a float and then to cents, which accumulates rounding error. Use `sats * priceCents / 100_000_000` with one rounding.
   - Per-component formatting logic, so the toggle misses one amount.
   - Percentages that each round and sum to 99.9.
+  - Hiding a column's header but not its cells.
 
 ---
 
 ## 06 — Budgets
 
-**Difficulty:** 6 · **Concept:** Inline editing, threshold states · **Target:** 1280px, and must work at 375px
+**Difficulty:** 6 · **Concept:** Inline editing, threshold states · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -357,7 +412,7 @@ Soft and friendly:
 
 The header reads "September budgets" with a month summary ("$X of $Y spent across 6 budgets").
 
-A 2-column grid of 6 budget cards (1 column at 375px) follows. Each card shows:
+A grid of 6 budget cards follows. Each card shows:
 
 - icon, category name, and owner team
 - a meter
@@ -365,6 +420,12 @@ A 2-column grid of 6 budget cards (1 column at 375px) follows. Each card shows:
 - an "Edit limit" button
 
 Editing replaces the limit text with a number input and Save / Cancel buttons.
+
+**Responsive:**
+
+- **Mobile:** one column. While editing, the limit input, Save and Cancel stack at full width.
+- **Tablet:** two columns.
+- **Desktop:** three columns.
 
 ### Data
 
@@ -387,11 +448,15 @@ Editing replaces the limit text with a number input and Save / Cancel buttons.
 - **C06-AC6:** When the user presses Escape (or Cancel) while editing, then the original limit is shown and focus returns to "Edit limit".
 - **C06-AC7:** When the user enters a negative or empty limit, then Save is disabled and "Enter a limit of $0 or more" is shown.
 - **C06-AC8:** Given a limit of 0 and spend above 0, then the card shows "Over by <spent>" without a divide-by-zero artifact (no "Infinity" or "NaN").
+- **C06-AC9:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C06-AC10:** Given a 375px viewport, then the six progressbars are stacked in one column.
+- **C06-AC11:** Given a 768px viewport, then the budget cards sit two per row. Given a 1280px viewport, three per row.
 
 ### Reference analysis
 
 - **Tree:** `Header > MonthSummary`, `BudgetGrid > BudgetCard > (CategoryIcon, Meter, StatusLine, LimitEditor)`.
 - **Tokens:** `bg-slate-50`, `bg-white`, `shadow-sm`, `rounded-3xl`, `rounded-full` buttons, fills `teal-500` / `amber-500` / `rose-500`, track `slate-100`.
+- **Breakpoints:** `grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3`. The editor is `flex flex-col tablet:flex-row`.
 - **State:**
   - `budgets` (limits are now editable) lives at the page level, because the header summary reads it.
   - `editingId` and `draft` are local to the card being edited.
@@ -405,7 +470,7 @@ Editing replaces the limit text with a number input and Save / Cancel buttons.
 
 ## 07 — Expense report
 
-**Difficulty:** 7 · **Concept:** Dynamic list of form rows · **Target:** 1280px, fixed
+**Difficulty:** 7 · **Concept:** Dynamic list of form rows · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -429,6 +494,12 @@ Line items are rows with columns Date, Merchant, Category (select), Amount, Rece
 
 A right-aligned summary shows subtotals by category, then a grand total. A policy panel lists violations. "Submit for approval" is at the bottom.
 
+**Responsive:**
+
+- **Mobile:** the paper sheet is full width with no shadow. Each line item is a stacked card: every field on its own line with a visible label, and the Remove button at the bottom.
+- **Tablet:** each line item takes two lines: Date, Merchant and Category on the first; Amount, Receipt and Remove on the second.
+- **Desktop:** one table-like row per item, as described, on the 960px sheet. Field labels become column headers and stay available to assistive tech.
+
 ### Data
 
 `data/07-expenses.json`
@@ -451,11 +522,16 @@ A right-aligned summary shows subtotals by category, then a grand total. A polic
 - **C07-AC5:** Given a Meals item over its $75.00 limit, then the policy panel lists "Meals over $75.00 limit: <merchant>".
 - **C07-AC6:** Given an item over $25.00 without "Receipt attached" checked, then the policy panel lists "Receipt required: <merchant>", and it disappears once checked.
 - **C07-AC7:** Given any row with an empty merchant or an amount that is not greater than 0, then "Submit for approval" is disabled. When the user activates it with a valid form, then "Report submitted" is shown with the total.
+- **C07-AC8:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C07-AC9:** Given a 375px viewport, then in the first row the Merchant field is below the Date field.
+- **C07-AC10:** Given a 768px viewport, then in the first row Date and Merchant sit side by side, and Amount is below them.
+- **C07-AC11:** Given a 1280px viewport, then in the first row Date, Merchant, Category, Amount and "Receipt attached" are on one line.
 
 ### Reference analysis
 
 - **Tree:** `ReportHeader`, `LineItemTable > LineItemRow × n`, `AddRowButton`, `Summary > (CategorySubtotals, Total)`, `PolicyPanel`, `SubmitBar`.
 - **Tokens:** `bg-gray-100`, `bg-white shadow-md`, `border-t-4 border-blue-700`, `divide-y divide-gray-200`, `bg-amber-50 text-amber-800`, `rounded-md`, 14px inputs.
+- **Breakpoints:** each row is `grid grid-cols-1 tablet:grid-cols-3 desktop:grid-cols-[120px_1fr_160px_120px_auto_auto]`; field labels `desktop:sr-only`.
 - **State:**
   - `items: [{ id, ...fieldsAsStrings }]` and `submitted`.
   - Subtotals, total, violations, and validity are all derived.
@@ -464,12 +540,13 @@ A right-aligned summary shows subtotals by category, then a grand total. A polic
   - `key={index}`, which fails AC3 visibly.
   - Violations stored in state and computed in an effect.
   - Forgetting to parse row amounts to cents before summing.
+  - Separate markup for mobile and desktop rows, which doubles every input.
 
 ---
 
 ## 08 — Approvals queue
 
-**Difficulty:** 8 · **Concept:** Optimistic actions, undo, bulk selection · **Target:** 1280px, fixed
+**Difficulty:** 8 · **Concept:** Optimistic actions, undo, bulk selection · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -501,6 +578,12 @@ Each list row has:
 
 Acting on a row removes it and shows the toast "<Approved|Rejected> <description> · Undo" for 5 seconds.
 
+**Responsive:**
+
+- **Mobile:** the sidebar is hidden behind a "Menu" button in the header that toggles it. Each row stacks: requester and description, then amount and date, then Approve and Reject.
+- **Tablet:** the sidebar is visible and "Menu" is gone. Rows put amount and date beside the description, with Approve and Reject wrapping below.
+- **Desktop:** one line per row, as described.
+
 ### Data
 
 `data/08-approvals.json`
@@ -521,11 +604,16 @@ Acting on a row removes it and shows the toast "<Approved|Rejected> <description
 - **C08-AC6:** When the user selects 3 rows and activates "Reject selected", then all 3 are removed and the message reads "Rejected 3 requests", with one Undo that restores all 3 in their original positions.
 - **C08-AC7:** Given all requests are actioned, then an empty state "You're all caught up" is shown.
 - **C08-AC8 (manual):** The toast auto-dismisses after about 5 seconds; after dismissal the action is final.
+- **C08-AC9:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C08-AC10:** Given a 375px viewport, then the sidebar's "Approvals" link is hidden until the user activates "Menu".
+- **C08-AC11:** Given a 768px or 1280px viewport, then the sidebar navigation is visible and there is no "Menu" button.
+- **C08-AC12:** Given a 1280px viewport, then each row's Approve button is on the same line as its description. Given a 375px viewport, it is below it.
 
 ### Reference analysis
 
 - **Tree:** `Sidebar`, `Header > (CountBadge, FilterTabs)`, `BulkBar`, `RequestList > RequestRow`, `Toast` (live region), `EmptyState`.
 - **Tokens:** `bg-gray-50` sidebar, `text-[13px]`, `violet-600`, `emerald-600`, `border-gray-300`, toast `bg-gray-900 rounded-full`, `divide-y`.
+- **Breakpoints:** sidebar `hidden tablet:flex`, with a `menuOpen` state that only mobile uses; rows `grid tablet:grid-cols-[1fr_auto] desktop:grid-cols-[auto_1fr_auto_auto_auto]`.
 - **State:** a reducer over `{ requests, selected: Set, lastAction: { kind, removed: [{ item, index }] } | null, filter }`.
   - Actions: `select`, `selectAll`, `act(ids, kind)`, `undo`, `expire`.
   - The visible list, counts, and select-all state are derived.
@@ -534,12 +622,13 @@ Acting on a row removes it and shows the toast "<Approved|Rejected> <description
   - Selection that persists ids of removed rows.
   - The toast timer not cleared on undo or on a second action.
   - A select-all that selects hidden (filtered-out) rows.
+  - Rendering the sidebar twice, once per tier.
 
 ---
 
 ## 09 — Spend analytics
 
-**Difficulty:** 9 · **Concept:** Hand-drawn SVG chart with accessible interaction · **Target:** 1280px, fixed
+**Difficulty:** 9 · **Concept:** Hand-drawn SVG chart with accessible interaction · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -565,6 +654,12 @@ The chart area is 1000×320 SVG with a y-axis of 5 ticks formatted in compact US
 
 Below the chart, a small "Top merchants" list shows 5 rows for the selected range.
 
+**Responsive:**
+
+- **Mobile:** KPIs in a 2×2 grid. The chart keeps a 640px minimum width inside a panel that scrolls sideways on its own; the page itself does not. Top merchants below the chart.
+- **Tablet:** KPIs in one row of four. The chart fits its panel with no sideways scroll.
+- **Desktop:** the chart and Top merchants side by side (2fr 1fr).
+
 ### Data
 
 `data/09-spend.json`
@@ -587,11 +682,16 @@ The range covers the most recent N days. The prior period is the N days before t
 - **C09-AC6:** Given the selected range, then the y-axis shows 5 tick labels in compact USD, the top tick is at least the tallest bar, and 0 is labelled "$0".
 - **C09-AC7:** Given the selected range, then "Top merchants" lists 5 merchant names ordered by total spend, descending.
 - **C09-AC8 (manual):** Gridlines align with ticks, and ghost bars sit behind the current bars.
+- **C09-AC9:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C09-AC10:** Given a 375px viewport, then the KPIs sit two per row, and the chart is wider than the viewport while the page does not scroll horizontally.
+- **C09-AC11:** Given a 768px viewport, then the four KPIs sit on one row.
+- **C09-AC12:** Given a 1280px viewport, then "Top merchants" is to the right of the chart.
 
 ### Reference analysis
 
 - **Tree:** `Header > RangeTabs`, `KpiRow`, `BarChart > (YAxis, Gridlines, BarGroup × n > (GhostBar, Bar), XAxis, Tooltip)`, `TopMerchants`.
 - **Tokens:** `bg-neutral-50`, `ring-1 ring-neutral-200`, `rounded-2xl`, `fill-blue-500` / `blue-700` / `neutral-300`, `stroke-neutral-200 stroke-dasharray`, `tabular-nums`.
+- **Breakpoints:** KPIs `grid-cols-2 tablet:grid-cols-4`; chart wrapper `overflow-x-auto` around an SVG `min-w-[640px] tablet:min-w-0 w-full`; page `desktop:grid-cols-[2fr_1fr]`.
 - **State:** `range` and `activeIndex`. The buckets, prior buckets, KPIs, scale, ticks, and top merchants are all derived with `useMemo` from `range`.
 - **Traps:**
   - A y-scale max equal to the data max, leaving the top bar touching the frame. Use a nice-number ceiling.
@@ -599,12 +699,13 @@ The range covers the most recent N days. The prior period is the N days before t
   - A tooltip on hover only, with no focus path.
   - Daily average computed over bars instead of days.
   - Timezone drift from `new Date("2026-09-28")`. Parse the date parts manually or use UTC throughout.
+  - Letting the page, not the chart panel, scroll sideways at 375.
 
 ---
 
 ## 10 — Transactions
 
-**Difficulty:** 10 · **Concept:** Search, filter, sort, and a detail drawer, composed · **Target:** 1440px, fixed
+**Difficulty:** 10 · **Concept:** Search, filter, sort, and a detail drawer, composed · **Target:** responsive, 375 / 768 / 1280
 
 ### What this tests
 
@@ -643,6 +744,12 @@ Headers for Date, Merchant, and Amount are sortable buttons.
 
 Clicking a row, or pressing Enter on a focused row button, opens the drawer. The drawer shows merchant, amount, status badge, date and time, card last4, cardholder, category, and a memo textarea with Save. Saving updates the row's memo and closes the drawer.
 
+**Responsive:**
+
+- **Mobile:** the nav shows only the wordmark. The toolbar stacks: search at full width, then Status and Category side by side, then the count. The table shows Date, Merchant and Amount; Cardholder, Category, Status and the receipt column are hidden. The drawer is full width.
+- **Tablet:** the toolbar is one row. The table adds Status; Cardholder, Category and the receipt column stay hidden. The drawer is 440px.
+- **Desktop:** everything as described.
+
 ### Data
 
 `data/10-transactions.json`
@@ -666,11 +773,16 @@ Default order is `postedAt` descending.
 - **C10-AC7:** When the user presses Escape or activates "Close", then the dialog closes and focus returns to the row that opened it.
 - **C10-AC8:** When the user edits the memo in the dialog and activates "Save", then the dialog closes, and searching for a word from the new memo finds that row.
 - **C10-AC9 (manual):** The header stays visible while scrolling; long merchant names truncate with an ellipsis and show the full name in the dialog.
+- **C10-AC10:** At 375, 768 and 1280, the page does not scroll horizontally.
+- **C10-AC11:** Given a 375px viewport, then the "Cardholder", "Category" and "Status" column headers are hidden, and an opened dialog is as wide as the viewport.
+- **C10-AC12:** Given a 768px viewport, then the "Status" header is visible, "Cardholder" is hidden, and an opened dialog is 440px wide.
+- **C10-AC13:** Given a 1280px viewport, then every column header is visible.
 
 ### Reference analysis
 
 - **Tree:** `TopNav`, `Toolbar > (SearchInput, StatusFilter > Popover, CategorySelect, ResultCount)`, `TransactionTable > (SortableHeader × 3, TransactionRow × n)`, `EmptyState`, `DetailDrawer > (Summary, MetaList, MemoForm)`.
 - **Tokens:** `bg-stone-950` nav, `max-w-7xl`, `h-12` rows, `divide-stone-200`, `hover:bg-stone-50`, badge pairs as listed, `w-[440px]` drawer, `bg-black/40` scrim, `sticky top-0` header.
+- **Breakpoints:** columns `hidden tablet:table-cell` (Status) and `hidden desktop:table-cell` (Cardholder, Category, receipt) on both `th` and `td`; toolbar `flex flex-col tablet:flex-row`; drawer `w-full tablet:w-[440px]`.
 - **State:**
   - `transactions` (memos are editable)
   - `query`, `statuses: Set`, `category`, `sort: { key, dir }`

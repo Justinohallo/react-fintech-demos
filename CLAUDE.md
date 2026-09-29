@@ -22,6 +22,8 @@ You are the **Builder**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `doc
 - **Never write inside `src/app/challenges/*/deliverable/attempt-*`.** Those files belong to the human. The only exception is the attempt template and the script that copies it.
 - **A criterion is met only when a test named with its ID passes.** Commit messages name the task and the AC IDs they satisfy.
 - **Tests query by role, label and visible text only.** No class selectors, no `data-testid`, no DOM structure. The same spec file must grade both the mock and a hand-built attempt. If an AC cannot be tested that way, mark it `manual` in the spec file header instead of weakening the selector rule.
+- **Layout ACs measure, they don't locate.** A responsive AC may read the bounding box of an element found by role, label or text, and the page's scroll width. It never finds an element by its position.
+- **Responsive, mobile-first, one breakpoint system** (`SPEC.md` §2). Base styles are mobile; override upward with `tablet:` and `desktop:` only. No `sm:`/`md:`/`lg:`/`xl:`/`2xl:` (they produce no CSS here), no `max-*` variants, no arbitrary `min-[…]:` queries.
 - **Money is integer minor units** (cents; satoshis for BTC) in data, formatted only at render with `Intl.NumberFormat`. No floats in data files.
 - **Dates are anchored to `KESTREL_TODAY = 2026-09-28`** from `src/lib/constants.ts`, never `new Date()`, so every rep sees the same data.
 - **Brand.** Kestrel is fictional. Never reference Brex, any real bank, any real card network logo or wordmark, or Burrard Works anywhere in the UI, data, or metadata. Card faces use a generic network mark.

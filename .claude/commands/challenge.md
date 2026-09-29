@@ -8,7 +8,8 @@ You are the Builder. Read `CLAUDE.md`, `SPEC.md`, and the section of `CHALLENGES
 - Generate its mock data into `data/$ARGUMENTS-*.json` per the challenge's Data section.
 - Write its Playwright acceptance specs per `SPEC.md` §7, one test per AC, each test named with its AC ID.
 - Run the suite against the mock with `npm run check -- $ARGUMENTS` until every AC passes.
-- Capture screenshots at 1440 and 375 wide into `docs/screenshots/$ARGUMENTS/`, inspect them yourself, and fix anything that contradicts the Visual direction.
+- Build it mobile-first on the responsive standard in `SPEC.md` §2 (`tablet:` and `desktop:` only), following the challenge's **Responsive** list.
+- Capture screenshots at 375, 768 and 1280 wide into `docs/screenshots/$ARGUMENTS/`, inspect them yourself, and fix anything that contradicts the Visual direction or the Responsive list.
 - Run `npm run build` clean.
 - Commit with a message that starts with the task ID (e.g. `T-4:`) and lists the AC IDs satisfied.
 
