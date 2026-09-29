@@ -69,8 +69,8 @@ The score is the checks and items passed, out of their total. Every mock scores 
 | `/challenges/NN` | TS | Challenge brief (§4). |
 | `/challenges/NN/mock` | TS | The reference implementation, full-bleed, no app chrome except a small floating "← Brief" link in a corner. |
 | `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. When the attempt has a review, its score (`4/10 ACs · 5/8 a11y`) and a link to it. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
-| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time, each linking to the guides that address it. The code rubric by rep, one row per dimension, and comment counts by category and severity. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
-| `/progress/NN/N` | TS | One review, rendered, then its code review: the rubric, and the attempt's `page.jsx` with line numbers and each comment shown under the lines it refers to. |
+| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time, each linking to the guides that address it. The code rubric by rep, one row per dimension, and comment counts by category and severity. Lookups per rep from the help logs, and lookup counts by category. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
+| `/progress/NN/N` | TS | One review, rendered, then its help log (each question asked during the rep), then its code review: the rubric, and the attempt's `page.jsx` with line numbers and each comment shown under the lines it refers to. |
 | `/guides` | TS | The curriculum: every guide, grouped by unit in unit order, each with its title and summary. Linked from every page header. Reads `guides/` at build time. |
 | `/guides/<slug>` | TS | One guide, rendered, with links to the previous and next guide in the curriculum. |
 | `/challenges/NN/deliverable/attempt-N` | **JSX** | An attempt. Its layout (TS) supplies only the floating timer and a "← Attempts" link. The page itself is the human's. |
@@ -204,9 +204,9 @@ The review writes one row per rep, replacing that rep's row if it is reviewed ag
 **Review (`/review NN N`).** A Claude Code command, run after every rep, in the Coach seat (`CLAUDE.md`).
 
 1. Run `npm run check -- NN N`.
-2. Read the attempt's `page.jsx` and `notes.md`, the challenge's section of `CHALLENGES.md`, §5 of this spec, and every earlier review in `reviews/`.
+2. Read the attempt's `page.jsx` and `notes.md`, its help log `reviews/NN/attempt-N.lookups.md` if there is one, the challenge's section of `CHALLENGES.md`, §5 of this spec, and every earlier review in `reviews/`.
 3. Write `reviews/NN/attempt-N.md` in the format below, the code review `reviews/NN/attempt-N.code.md`, and the rep's `REPS.md` row.
-4. Commit them with a message starting `Review NN attempt N:` and the score.
+4. Commit them, and the help log, with a message starting `Review NN attempt N:` and the score.
 
 Front matter, one `key: value` per line, so the site can read it without a YAML parser:
 
@@ -292,6 +292,20 @@ Guide: [Composing components](/guides/composing-components)
 
 Comments follow the attempt's line order. A review's Next rep may draw on the code review, but the two are scored separately.
 
+**Help log (`reviews/NN/attempt-N.lookups.md`).** Every question the human asks Claude during a rep (`CLAUDE.md`), appended as it's answered. One entry per `###` heading:
+
+```
+### 16:12 · styling · Grid items not filling the cell
+**Asked:** How do I get the items in the grid to fill the space?
+**Answer:** The grid items stretch; the visible Card inside them doesn't. Add `h-full` to the Card.
+Guide: [Tailwind utilities that bite](/guides/tailwind-utilities-that-bite)
+```
+
+- The heading is the local time (`HH:MM`, or `–:–` if it wasn't recorded), a category, and a topic of a few words.
+- **Category:** one of the seven code dimensions, or `method` for questions about the rep's process: planning, reading tokens, time.
+- **Asked** is the question in the human's words, lightly trimmed. **Answer** is the gist in one to three sentences. **Guide** links the guide that covers it, if one does.
+- The review counts the log's entries as the rep's lookups, alongside the notes' Lookups section. The REPS row's Top lookup is whichever cost the most time.
+
 **Guides (`guides/<slug>.md`).** The curriculum. It grows over time: adding a guide is adding a file. Front matter, one `key: value` per line:
 
 ```
@@ -343,6 +357,7 @@ worksheet: tokens
 | T-1.4 | Guides: `/guides` and `/guides/<slug>`, a Guides link in the page header, worksheet links on `/framework`, guide links beside recurring issues on `/progress`, the `/guide` command; first guides "The 5-minute read" and "Reading tokens" | T-1.3 |
 | T-1.5 | Notes scaffolding: guided, prompted and bare notes templates, level selection and `--notes=` in the attempt script, the attempt index and `/review` read the new structure | T-1.4 |
 | T-1.6 | Code review: the code review format read by the site, annotated source and rubric on `/progress/NN/N`, rubric and category counts on `/progress`, `/review` writes it; Code craft guides "Composing components", "Props and money" and "Tailwind utilities that bite"; backfill code reviews of challenge 01 attempts 1 and 2 | T-1.5 |
+| T-1.7 | Help logs: shown on `/progress/NN/N`, lookups per rep and by category on `/progress`, read by `/review` | T-1.6 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 

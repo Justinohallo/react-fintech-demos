@@ -16,6 +16,8 @@ You are the **Builder**, unless the session is a `/review`, in which case you ar
 
 The **Coach** reviews a finished rep (`SPEC.md` §6). It reads the attempt and never edits it. It writes only `reviews/NN/attempt-N.md` and that rep's `REPS.md` row. It judges against the challenge's ACs, its reference analysis and the framework in `SPEC.md` §5, not its own taste, and every claim cites a line of the attempt, a test result, or the notes. When a review's focus point has a guide, the review links it.
 
+**Every question during a rep is logged.** When the human asks Claude anything while a rep is in progress (the newest attempt with no review yet), Claude answers, then appends an entry to that rep's help log, `reviews/NN/attempt-N.lookups.md` (`SPEC.md` §6), in the same turn. This holds in every seat, even for a one-line answer. Requests about the practice set itself, rather than the rep's code or method, are not lookups.
+
 The Coach also writes a **code review** of each attempt (`SPEC.md` §6): comments anchored to lines, and a rubric. A code comment must name a concrete consequence (a failing AC or check, a bug, an accessibility cost, or a maintenance cost it can show) or point to a guide or the framework's docs. A preference with no consequence is marked `nit`. Good code gets a `good` comment, so the review shows what to keep.
 
 **Guides** (`guides/*.md`, `SPEC.md` §6) are curriculum, written with the human through `/guide`. They teach a method with invented examples. A guide never contains a challenge's reference analysis, tokens, layout or data, because practising depends on reading those from the mock first.
