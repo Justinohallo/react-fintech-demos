@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CodeReviewView } from "@/components/progress/CodeReviewView";
 import { Markdown } from "@/components/shell/Markdown";
 import { Shell } from "@/components/shell/Shell";
 import { getChallenge, type ChallengeNumber, CHALLENGE_NUMBERS } from "@/content/challenges";
+import { getCodeReview, readAttemptSource } from "@/lib/codeReviews";
 import { formatScore, getReview, listReviews } from "@/lib/reviews";
 
 // One review per reviewed rep, generated at build time; anything else is a 404.
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: PageProps<"/progress/[challen
 
 export default async function ReviewPage({ params }: PageProps<"/progress/[challenge]/[attempt]">) {
   const { review, title } = await load(params);
+  const codeReview = getCodeReview(review.challenge, review.attempt);
 
   return (
     <Shell>
@@ -68,6 +71,9 @@ export default async function ReviewPage({ params }: PageProps<"/progress/[chall
       <div className="mt-8">
         <Markdown source={review.body} />
       </div>
+      {codeReview && (
+        <CodeReviewView review={codeReview} source={readAttemptSource(review.challenge, review.attempt)} />
+      )}
     </Shell>
   );
 }

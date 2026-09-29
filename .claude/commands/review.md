@@ -17,7 +17,8 @@ Run `npm run check -- NN N`. It saves `reviews/NN/attempt-N.check.json`. Use tha
 - The `## NN —` section of `CHALLENGES.md`: ACs, accessibility items, Responsive list, reference analysis.
 - `tests/challenges/NN.spec.ts`, to explain precisely what a failed test expected.
 - Every earlier review, `reviews/*/attempt-*.md`, for section 7 and for recurring tags.
-- The front matter of every guide in `guides/`, to link the guide behind each focus point.
+- The front matter of every guide in `guides/`, to link the guide behind each focus point and each code comment (`addresses` and `code`).
+- Every earlier code review, `reviews/*/attempt-*.code.md`, to see which rubric scores moved.
 
 ## 3. Write `reviews/NN/attempt-N.md`
 
@@ -53,6 +54,16 @@ Then these sections, in order, as `##` headings:
 
 Judge against the ACs, the reference analysis and §5, not your own taste. Every claim cites a line of the attempt, a test result, or the notes. Be direct and specific, and plain about what went well.
 
+## 3b. Write `reviews/NN/attempt-N.code.md`
+
+The code review, as a senior engineer would review a pull request (SPEC.md §6, **Code review**).
+
+- Front matter: `structure`, `data_flow`, `styling`, `correctness`, `naming`, `idioms`, `markup`, each 0–3 by the §6 scale.
+- One comment per `###` heading, in line order: `### page.jsx:<start>-<end> · <must|should|nit|good> · <category>`, where the category is one of the seven dimension keys.
+- Every comment names its consequence: the AC or check it breaks, the bug, the accessibility cost, or a maintenance cost you can show. Otherwise it's a `nit`. Put a `good` comment on what's worth keeping.
+- Link a guide whose `code` list includes the comment's category, as `Guide: [Title](/guides/<slug>)`.
+- **Check every line reference and every claim against the file before writing.** A review that's wrong about the code teaches the wrong lesson.
+
 ## 4. Log
 
 In `REPS.md`, write one row for this rep, replacing any existing row for the same challenge and attempt:
@@ -62,8 +73,12 @@ In `REPS.md`, write one row for this rep, replacing any existing row for the sam
 ## 5. Commit
 
 ```
-git add reviews/NN/attempt-N.md reviews/NN/attempt-N.check.json REPS.md
+git add reviews/NN/attempt-N.md reviews/NN/attempt-N.code.md reviews/NN/attempt-N.check.json REPS.md
 git commit -m "Review NN attempt N: <acs> ACs · <a11y> a11y"
 ```
 
-Do not push. Finish by telling the human the score, the three focus points, and the link `/progress/NN/N`.
+Do not push. Finish by telling the human the score, the rubric (and what moved since the last code review), the three focus points, and the link `/progress/NN/N`.
+
+## Discussing a comment
+
+When the human questions a code comment, answer it, then add the exchange under that comment as `**You:**` and `**Coach:**` lines. If the discussion changes the verdict, change the comment's severity or text too, and commit with a message starting `Review NN attempt N: discussion`.

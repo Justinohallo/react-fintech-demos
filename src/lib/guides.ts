@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { isDimension, type CodeDimension } from "@/content/codeReview";
 import { isReviewTag, type ReviewTag } from "@/content/reviewTags";
 import { parseFrontMatter, toList, toNumber } from "./frontMatter";
 
@@ -17,6 +18,7 @@ export type Guide = {
   order: number;
   summary: string;
   addresses: ReviewTag[];
+  code: CodeDimension[];
   worksheet: WorksheetStep | null;
   body: string;
 };
@@ -50,6 +52,7 @@ export function listGuides(): Guide[] {
         order: toNumber(meta.order) ?? 99,
         summary: meta.summary ?? "",
         addresses: toList(meta.addresses, ",").filter(isReviewTag),
+        code: toList(meta.code, ",").filter(isDimension),
         worksheet: isStep(meta.worksheet) ? meta.worksheet : null,
         body,
       };

@@ -56,6 +56,11 @@ test.describe("every route returns 200 and renders its heading", () => {
       await visit(page, route);
       await expect(page.getByRole("heading", { level: 1, name: /^Review · / })).toBeVisible();
       await expect(page.getByRole("heading", { level: 2, name: "Score" })).toBeVisible();
+      const [, nn, n] = route.split("/").slice(1);
+      if (fs.existsSync(path.join(reviewsDir, nn, `attempt-${n}.code.md`))) {
+        await expect(page.getByRole("heading", { level: 2, name: "Code review" })).toBeVisible();
+        await expect(page.getByRole("region", { name: "page.jsx with review comments" })).toBeVisible();
+      }
     });
   }
 

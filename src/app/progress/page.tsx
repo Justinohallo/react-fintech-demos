@@ -4,6 +4,8 @@ import { ProgressChart } from "@/components/progress/ProgressChart";
 import { InlineCode } from "@/components/shell/InlineCode";
 import { Shell } from "@/components/shell/Shell";
 import { REVIEW_TAGS, type ReviewTag } from "@/content/reviewTags";
+import { CODE_DIMENSIONS, DIMENSION_KEYS, SEVERITY_KEYS } from "@/content/codeReview";
+import { getCodeReview } from "@/lib/codeReviews";
 import { guidesForTag } from "@/lib/guides";
 import { formatScore, listReviews } from "@/lib/reviews";
 
@@ -22,6 +24,15 @@ export default function ProgressPage() {
   };
   const recent = count(reviews.slice(-5));
   const allTime = count(reviews);
+  const codeReviews = reviews
+    .map((r) => ({ r, code: getCodeReview(r.challenge, r.attempt) }))
+    .filter((x): x is { r: (typeof reviews)[number]; code: NonNullable<ReturnType<typeof getCodeReview>> } => x.code !== null);
+  const commentCounts = DIMENSION_KEYS.map((d) => ({
+    d,
+    counts: SEVERITY_KEYS.map((s) =>
+      codeReviews.reduce((n, { code }) => n + code.comments.filter((c) => c.category === d && c.severity === s).length, 0),
+    ),
+  }));
   const tags = [...allTime.keys()].sort(
     (a, b) => (recent.get(b) ?? 0) - (recent.get(a) ?? 0) || allTime.get(b)! - allTime.get(a)!,
   );
@@ -104,6 +115,67 @@ export default function ProgressPage() {
               </table>
             </div>
           </section>
+
+          {codeReviews.length > 0 && (
+            <section className="mt-10">
+              <h2 className="text-xl font-semibold tracking-tight">Code rubric</h2>
+              <p className="mt-2 text-sm text-stone-600">Each dimension scored 0–3 per rep, oldest first.</p>
+              <div aria-label="Code rubric by rep" role="region" tabIndex={0} className="relative mt-4 overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-stone-100 text-stone-600">
+                    <tr>
+                      <th scope="col" className="px-3 py-2 font-medium">Dimension</th>
+                      {codeReviews.map(({ r }) => (
+                        <th key={`${r.challenge}-${r.attempt}`} scope="col" className="px-3 py-2 text-center font-medium whitespace-nowrap">
+                          {r.challenge}·{r.attempt}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-200 tabular-nums">
+                    {DIMENSION_KEYS.map((d) => (
+                      <tr key={d}>
+                        <th scope="row" className="px-3 py-2 font-medium whitespace-nowrap">{CODE_DIMENSIONS[d]}</th>
+                        {codeReviews.map(({ r, code }) => (
+                          <td key={`${r.challenge}-${r.attempt}`} className="px-3 py-2 text-center">
+                            {code.rubric[d] ?? "–"}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 className="mt-8 font-semibold text-stone-900">Code comments, all reps</h3>
+              <div aria-label="Code comments by category and severity" role="region" tabIndex={0} className="relative mt-4 overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-stone-100 text-stone-600">
+                    <tr>
+                      <th scope="col" className="px-3 py-2 font-medium">Category</th>
+                      {SEVERITY_KEYS.map((s) => (
+                        <th key={s} scope="col" className="px-3 py-2 text-right font-medium">
+                          {s}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-200 tabular-nums">
+                    {commentCounts.map(({ d, counts }) => (
+                      <tr key={d}>
+                        <th scope="row" className="px-3 py-2 font-medium whitespace-nowrap">{CODE_DIMENSIONS[d]}</th>
+                        {counts.map((n, i) => (
+                          <td key={i} className="px-3 py-2 text-right">
+                            {n}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
 
           <section className="mt-10">
             <h2 className="text-xl font-semibold tracking-tight">Recurring issues</h2>
