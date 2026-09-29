@@ -157,15 +157,15 @@ Say the decision, then the reason. For example: "Grid here because the columns a
 - It keeps running past 60 minutes, showing overtime in a warning colour.
 - It can be collapsed to a small pill.
 
-**Attempt script (`npm run attempt -- NN`).** A plain Node script, no dependencies.
+**Attempt script (`npm run attempt -- NN [--notes=guided|prompted|bare]`).** A plain Node script, no dependencies.
 
 1. Copy `src/app/challenges/_template/attempt/page.jsx` to the next free `attempt-N` folder under challenge NN.
-2. Write a `notes.md` there from the notes template.
-3. Print the local URL.
+2. Write a `notes.md` there from the notes template, at the scaffolding level below.
+3. Print the local URL and the notes level.
 
 The page template is a single `'use client'` component. It has an empty `<main>`, imports the challenge's data JSON, and contains a one-line comment naming the challenge. Nothing else.
 
-**Notes template (`notes.md`).** Headings, in order:
+**Notes template (`notes.md`).** Headings, in order, at every level:
 
 - Date
 - Rep minutes
@@ -176,6 +176,20 @@ The page template is a single `'use client'` component. It has an empty `<main>`
 - Lookups (what I had to search or ask)
 - What I'd do next
 
+**Scaffolding levels.** The notes give more support early and fade as the routine becomes habit. The level is chosen by rep number, which is the count of attempt folders across all challenges, including the new one. `--notes=` overrides it.
+
+| Level | Reps | Under the headings |
+|---|---|---|
+| Guided | 1–5 | A prompt under every heading; fill-in slots for the plan; the checkpoint table; the self-check and closing statement |
+| Prompted | 6–12 | One short prompt per heading; the plan slots; the checkpoint table |
+| Bare | 13 and on | Headings only |
+
+- **Prompts** are Markdown quote lines (`> …`) and may link a guide.
+- **Plan slots** (under the analysis heading): `Started at:` and `Finished at:` (minutes into the rep); `Requirements:` as ACs by kind (layout, data, interaction) plus accessibility items; then one line each for `Regions:`, `Tiers:` (375 · 768 · 1280), `Tokens:`, `Data:`, `State:` and `Questions:`.
+- **Checkpoint table** (under Where time went): the minute each checkpoint was reached against its target: plan written (5), every region at all three tiers (15), all content rendered from data (40), core interaction and states working (50), closing statement given (60).
+- **Self-check** (under What I'd do next, Guided only): Requirements read before the mock; every value from the data file; all three tiers built; `npm run check` run before 60:00. Then the §5 closing statement: done, not done and in what order, and what you'd add before shipping.
+
+When the attempt index and the review read notes, they ignore prompt lines, unfilled slots (a label ending in `:` with nothing after it), unchecked self-check boxes and empty table cells. So a blank never reads as content.
 **Check script (`npm run check -- NN [N]`).** Runs `tests/challenges/NN.spec.ts` and `tests/a11y.spec.ts` with a base-path variable pointing at `/challenges/NN/mock`, or at `/challenges/NN/deliverable/attempt-N` when N is given. Prints pass/fail per AC ID, then the accessibility bonus per item, then one score line, e.g. `10/10 ACs · 7/8 a11y`. Only ACs affect the exit code.
 
 When N is given, the check script also saves the result to `reviews/NN/attempt-N.check.json`: timestamp, and status per AC and accessibility ID. A later run overwrites it.
@@ -289,6 +303,7 @@ worksheet: tokens
 | T-1.2 | Accessibility bonus: install `@axe-core/playwright` (ADR-002), `tests/a11y.spec.ts`, bonus scoring in the check script, brief pages list the bonus, `REPS.md` A11y column | T-1.1 |
 | T-1.3 | Rep reviews: the check script saves attempt results, the `/review` command, review scores and links on attempt indexes, `/progress` and `/progress/NN/N`, a Progress link in the page header; backfill the review of challenge 01 attempt 1 | T-1.2 |
 | T-1.4 | Guides: `/guides` and `/guides/<slug>`, a Guides link in the page header, worksheet links on `/framework`, guide links beside recurring issues on `/progress`, the `/guide` command; first guides "The 5-minute read" and "Reading tokens" | T-1.3 |
+| T-1.5 | Notes scaffolding: guided, prompted and bare notes templates, level selection and `--notes=` in the attempt script, the attempt index and `/review` read the new structure | T-1.4 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 
