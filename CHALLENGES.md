@@ -260,7 +260,7 @@ A summary box shows amount, fee, total debited, and remaining balance. A "Review
 ### Reference analysis
 
 - **Tree:** `PaymentForm > (Field × 4, SpeedRadio, Summary, Submit)`, `Confirmation`.
-- **Tokens:** `border-2 border-neutral-900`, `shadow-[4px_4px_0_theme(colors.neutral.900)]`, `rounded-none`, `bg-orange-50`, `text-red-600`. Spacing base 8.
+- **Tokens:** `border-2 border-neutral-900`, `shadow-[4px_4px_0_var(--color-neutral-900)]`, `rounded-none`, `bg-orange-50`, `text-red-600`. Spacing base 8.
 - **State:**
   - `values` (strings as typed) and `touched` are state.
   - `amountCents`, `feeCents`, `totalCents`, `errors`, and `canSubmit` are all derived.
@@ -473,7 +473,7 @@ A right-aligned summary shows subtotals by category, then a grand total. A polic
 
 ### What this tests
 
-Selection state across a list, including select-all with an indeterminate checkbox. It also tests optimistic removal with an undo toast that restores the item to its original position, and a live region for announcements. The same mechanism as the reducer drill in `DEFENSE.md`.
+Selection state across a list, including select-all with an indeterminate checkbox. It also tests optimistic removal with an undo toast that restores the item to its original position, and a live region for announcements.
 
 ### Visual direction
 

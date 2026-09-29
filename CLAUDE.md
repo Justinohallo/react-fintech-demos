@@ -30,6 +30,12 @@ You are the **Builder**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `doc
 
 Mocks must match their Visual direction. After building a mock, take the screenshots described in `SPEC.md` §7, look at them, and fix what does not match before committing. Do not ask the human to look at a mock. They are practising against these designs and should not see them early.
 
+## Framework docs
+
+Next.js 16 differs from older versions, and its docs ship in `node_modules/next/dist/docs/`. Read the relevant guide there before writing Next.js code:
+
+@AGENTS.md
+
 ## Commands
 
 - `npm run dev` / `npm run build`

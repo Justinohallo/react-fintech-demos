@@ -273,7 +273,7 @@ export const challenges: Challenge[] = [
     referenceAnalysis: {
       tree: "`PaymentForm > (Field × 4, SpeedRadio, Summary, Submit)`, `Confirmation`.",
       tokens:
-        "`border-2 border-neutral-900`, `shadow-[4px_4px_0_theme(colors.neutral.900)]`, `rounded-none`, `bg-orange-50`, `text-red-600`. Spacing base 8.",
+        "`border-2 border-neutral-900`, `shadow-[4px_4px_0_var(--color-neutral-900)]`, `rounded-none`, `bg-orange-50`, `text-red-600`. Spacing base 8.",
       state: {
         points: [
           "`values` (strings as typed) and `touched` are state.",
@@ -491,7 +491,7 @@ export const challenges: Challenge[] = [
     target: "1280px, fixed",
     dataFile: "08-approvals.json",
     whatThisTests:
-      "Selection state across a list, including select-all with an indeterminate checkbox. It also tests optimistic removal with an undo toast that restores the item to its original position, and a live region for announcements. The same mechanism as the reducer drill in `DEFENSE.md`.",
+      "Selection state across a list, including select-all with an indeterminate checkbox. It also tests optimistic removal with an undo toast that restores the item to its original position, and a live region for announcements.",
     acceptanceCriteria: [
       {
         id: "C08-AC1",

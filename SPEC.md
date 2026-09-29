@@ -33,7 +33,7 @@ Attempts persist and deploy, so progress is visible over time. It must be usable
 | `/framework` | TS | The method (§5). Readable in two minutes. Linked from every page header. |
 | `/challenges/NN` | TS | Challenge brief (§4). |
 | `/challenges/NN/mock` | TS | The reference implementation, full-bleed, no app chrome except a small floating "← Brief" link in a corner. |
-| `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first line of its notes. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
+| `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
 | `/challenges/NN/deliverable/attempt-N` | **JSX** | An attempt. Its layout (TS) supplies only the floating timer and a "← Attempts" link. The page itself is the human's. |
 
 `NN` is zero-padded, `01`–`10`. Use static folders per challenge, not a dynamic segment, so attempt folders can sit under them.
@@ -105,6 +105,7 @@ Say the decision, then the reason. For example: "Grid here because the columns a
 
 **Timer.** A floating panel on brief pages and attempt pages.
 
+- One timer per challenge: a challenge's brief page and its attempt pages share the same state.
 - Controls: Start, Pause, Reset.
 - Shows elapsed time as mm:ss and the current phase name from §5.
 - A thin progress bar with ticks at 5, 15, 40, 50 and 60.
@@ -144,7 +145,9 @@ The human fills it in. The Builder only creates the header.
 ## 7. Tests
 
 - `tests/smoke.spec.ts` (T-1):
-  - every route in §3 returns 200 and renders its heading
+  - every route in §3 returns 200
+  - shell routes (`/`, `/framework`, briefs, attempt indexes) render their `h1`; mocks render a heading and the "← Brief" link
+  - attempt pages are checked only for the layout's timer and "← Attempts" link, because the page's own heading belongs to the human
   - the timer starts, persists across a reload, and resets
   - the reveal on a brief page requires the confirm step
 - `tests/challenges/NN.spec.ts` (T-2 … T-11):
