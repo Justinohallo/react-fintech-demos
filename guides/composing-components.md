@@ -36,24 +36,48 @@ Both render the same pixels. They differ in what happens when the code changes.
 - Labelling a list with the heading (`aria-labelledby`) needs an `id` that now has to be passed between files.
 - The generic `Card` starts growing flags like `isPrimary` to pick a heading level, because it's being told about content it doesn't own.
 
-With shape B, `Card` stays a small presentational wrapper (border, radius, padding), and each section decides its own heading level:
+With shape B, `Card` stays a small presentational wrapper (border, radius, padding), and each section decides its own heading level.
+
+## Semantics belong with whoever knows the meaning
+
+Different meanings are known at different levels, so the semantic elements live at different levels too:
+
+| Meaning | Who knows it | Where the element goes |
+|---|---|---|
+| "This is the site's top bar" / "this is the page's main content" | The page or layout | `<header>` and `<main>` in the page, never inside a reusable component |
+| "This is a section called Invoices, and here is its list" | The component that owns that content | `<section aria-labelledby>` plus its heading and list, together in `InvoicesCard` |
+| "This is a box with a border and padding" | The generic `Card` | **No semantics of its own.** It can't know whether it's a section, a list item or an article. |
+
+A generic `Card` that hard-codes `<section>` bakes in a meaning it can't know: the same box might be a `<section>` on one page, an `<li>` in a list of cards, or an `<article>` in a feed. Two clean ways to keep it neutral:
 
 ```jsx
+// 1. Card is a plain box; the section component supplies the meaning.
 function Card({ className = "", children }) {
-  return <section className={`rounded-xl border border-zinc-200 bg-white p-6 ${className}`}>{children}</section>;
+  return <div className={`rounded-xl border border-zinc-200 bg-white p-6 ${className}`}>{children}</div>;
 }
 
 function InvoicesCard({ invoices, className }) {
   return (
-    <Card className={className}>
-      <h2 id="invoices-heading" className="text-lg font-medium">Invoices</h2>
-      <ul aria-labelledby="invoices-heading">
-        {invoices.map((inv) => <InvoiceRow key={inv.id} invoice={inv} />)}
-      </ul>
-    </Card>
+    <section aria-labelledby="invoices-heading" className={className}>
+      <Card>
+        <h2 id="invoices-heading" className="text-lg font-medium">Invoices</h2>
+        <ul aria-labelledby="invoices-heading">
+          {invoices.map((inv) => <InvoiceRow key={inv.id} invoice={inv} />)}
+        </ul>
+      </Card>
+    </section>
   );
 }
+
+// 2. Card renders whatever element it's told (an `as` prop, common in design systems).
+function Card({ as: Tag = "div", className = "", ...props }) {
+  return <Tag className={`rounded-xl border border-zinc-200 bg-white p-6 ${className}`} {...props} />;
+}
+
+<Card as="section" aria-labelledby="invoices-heading" className={className}>…</Card>
 ```
+
+Option 1 is simpler in a timed rep; option 2 saves a wrapper. What matters in both: the `<section>`, its heading, and the `id` that links them sit in **one component**, because they have to stay in sync.
 
 **Placement is the page's job.** Which grid area a card sits in is layout, and layout belongs to the page. So the page passes placement in, and the card never needs to know about the grid:
 
@@ -73,6 +97,7 @@ With shape B, the page reads like the Regions line of your plan: `<SummaryCard/>
 | Symptom | Code review category |
 |---|---|
 | A `Card` with flags like `isPrimary` or `showTotal` | `structure` |
+| A generic `Card` that hard-codes `<section>`, or `<header>`/`<main>` inside a reusable component | `markup` |
 | A section title passed as a string from the page, far from its content | `structure` |
 | A heading level chosen for size, or skipped | `markup` (and review tag `non-semantic-markup`) |
 | A card that knows its own grid area | `structure` |
