@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind v4, configured CSS-first. No global colours or fonts here: each
+ * mock and attempt owns its visual direction, and the shell styles itself.
+ */
