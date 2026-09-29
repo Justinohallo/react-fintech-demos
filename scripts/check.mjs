@@ -117,5 +117,32 @@ console.log(
     (missing.length ? ` · ${missing.length} ACs missing` : "") +
     (manual.length ? ` · ${manual.length} manual` : ""),
 );
+// Attempt results are saved for the review (SPEC.md §6). A later run overwrites.
+if (nArg !== undefined) {
+  const statuses = {};
+  const idOf = (title) => /^(C\d\d-AC\d+|A11Y-\d+|C\d\d-A11Y\d+)\b/.exec(title)?.[1];
+  for (const r of results) if (idOf(r.title)) statuses[idOf(r.title)] = r.status;
+  for (const id of [...missing, ...a11yMissing]) statuses[id] = "MISSING";
+  for (const id of manual) statuses[id] = "MANUAL";
+  const out = path.join(root, "reviews", nn, `attempt-${Number(nArg)}.check.json`);
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(
+    out,
+    `${JSON.stringify(
+      {
+        checkedAt: new Date().toISOString(),
+        challenge: nn,
+        attempt: Number(nArg),
+        acs: `${passed}/${graded}`,
+        a11y: `${a11yPassed}/${a11yIds.length}`,
+        results: statuses,
+      },
+      null,
+      2,
+    )}\n`,
+  );
+  console.log(`Saved ${path.relative(root, out)}`);
+}
+
 // Only ACs decide the exit code; the accessibility bonus never fails a rep.
 process.exit(passed === graded ? 0 : 1);

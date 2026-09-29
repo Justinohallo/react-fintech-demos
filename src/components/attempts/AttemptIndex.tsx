@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Shell } from "@/components/shell/Shell";
 import { getChallenge, type ChallengeNumber } from "@/content/challenges";
 import { listAttempts } from "@/lib/attempts";
+import { formatScore, getReview } from "@/lib/reviews";
 
 // Reads the filesystem at build time (SPEC.md §3).
 export function AttemptIndex({ number }: { number: ChallengeNumber }) {
@@ -28,23 +29,46 @@ export function AttemptIndex({ number }: { number: ChallengeNumber }) {
         <p className="mt-8 text-stone-600">No attempts yet.</p>
       ) : (
         <ol className="mt-8 divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
-          {attempts.map((a) => (
-            <li key={a.slug}>
-              <Link
-                href={`/challenges/${c.number}/deliverable/${a.slug}`}
-                className="block px-4 py-3 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-teal-600"
-              >
-                <span className="flex items-baseline justify-between gap-4">
-                  <span className="font-medium">Attempt {a.n}</span>
+          {attempts.map((a) => {
+            const review = getReview(c.number, a.n);
+            return (
+              <li key={a.slug} className="px-4 py-3">
+                <div className="flex items-baseline justify-between gap-4">
+                  <Link
+                    href={`/challenges/${c.number}/deliverable/${a.slug}`}
+                    className="font-medium underline-offset-4 hover:text-teal-800 hover:underline"
+                  >
+                    Attempt {a.n}
+                  </Link>
                   <span className="text-sm text-stone-500">
                     {a.date ?? "No date"}
                     {a.repMinutes ? ` · ${a.repMinutes} min` : ""}
                   </span>
-                </span>
-                {a.firstLine && <span className="mt-1 block truncate text-sm text-stone-600">{a.firstLine}</span>}
-              </Link>
-            </li>
-          ))}
+                </div>
+                {a.firstLine && <p className="mt-1 truncate text-sm text-stone-600">{a.firstLine}</p>}
+                <p className="mt-2 text-sm">
+                  {review ? (
+                    <>
+                      <span className="tabular-nums">
+                        {formatScore(review.acs)} ACs · {formatScore(review.a11y)} a11y
+                      </span>
+                      {" · "}
+                      <Link
+                        href={`/progress/${c.number}/${a.n}`}
+                        className="text-teal-800 underline underline-offset-4 hover:text-teal-950"
+                      >
+                        Review<span className="sr-only"> of attempt {a.n}</span>
+                      </Link>
+                    </>
+                  ) : (
+                    <span className="text-stone-500">
+                      Not reviewed yet. Run <code className="font-mono">/review {c.number} {a.n}</code>
+                    </span>
+                  )}
+                </p>
+              </li>
+            );
+          })}
         </ol>
       )}
     </Shell>

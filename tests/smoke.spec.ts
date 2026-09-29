@@ -31,6 +31,34 @@ test.describe("every route returns 200 and renders its heading", () => {
     ).toBeVisible();
   });
 
+  test("/progress", async ({ page }) => {
+    await visit(page, "/progress");
+    await expect(page.getByRole("heading", { level: 1, name: "Progress" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Site" }).getByRole("link", { name: "Progress" })).toBeVisible();
+  });
+
+  // One page per review on disk; unknown reviews are not generated.
+  const reviewsDir = "reviews";
+  const reviewFiles = fs.existsSync(reviewsDir)
+    ? fs
+        .readdirSync(reviewsDir)
+        .filter((d) => /^\d\d$/.test(d))
+        .flatMap((d) =>
+          fs
+            .readdirSync(path.join(reviewsDir, d))
+            .map((f) => /^attempt-(\d+)\.md$/.exec(f))
+            .filter((m): m is RegExpExecArray => m !== null)
+            .map((m) => `/progress/${d}/${m[1]}`),
+        )
+    : [];
+  for (const route of reviewFiles) {
+    test(route, async ({ page }) => {
+      await visit(page, route);
+      await expect(page.getByRole("heading", { level: 1, name: /^Review · / })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 2, name: "Score" })).toBeVisible();
+    });
+  }
+
   test("/framework", async ({ page }) => {
     await visit(page, "/framework");
     await expect(page.getByRole("heading", { level: 1, name: "The method" })).toBeVisible();
@@ -126,7 +154,7 @@ test("the reveal on a brief page requires the confirm step", async ({ page }) =>
 
 // SPEC.md §2: the shell is on the responsive standard too.
 test.describe("shell pages do not scroll horizontally at any tier", () => {
-  const shellRoutes = ["/", "/framework", "/challenges/10", "/challenges/10/deliverable"];
+  const shellRoutes = ["/", "/framework", "/progress", "/challenges/10", "/challenges/10/deliverable"];
   for (const tier of TIER_NAMES) {
     test(`${tier} ${TIERS[tier].width}px`, async ({ page }) => {
       await setTier(page, tier);
