@@ -4,3 +4,4 @@
 |---|---|---|---|---|---|---|---|
 | 2026-09-29 | 01 | 1 | 60 | Components and data | 4/10 | 5/8 | Tailwind classes |
 | 2026-09-29 | 01 | 2 | 60 | Components and data | 2/10 | 4/8 | Data format methods |
+| 2026-09-29 | 01 | 3 | 60 | Interaction and states | 5/10 | 4/8 | Grid breakpoints (`md:` vs `tablet:`) |
