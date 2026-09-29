@@ -12,38 +12,32 @@ __DATE__
 
 ## 5-minute analysis: regions, tokens, data shape, state
 
-> Five minutes, five-ish lines. Stop at the timer's 5:00 cue even if a line is incomplete; write `?` and move on. Guide: [The 5-minute read](/guides/the-5-minute-read)
+> Five minutes, five-ish lines. Write each answer **after the colon, on the same line**. Stop at the timer's 5:00 cue even if a line is incomplete; write `?` and move on. Guide: [The 5-minute read](/guides/the-5-minute-read)
 
 Started at:
 Finished at:
-
-> Read the brief's Requirements before the mock. Count them: how many are layout, how many data, how many interaction?
+> Minutes on the rep timer, not the clock: usually `Started at: 0` and `Finished at: 5`.
 
 Requirements:
-
-> Name each box on the design as a component, nested with `>`.
+> Read the brief's Requirements before the mock. Count them by kind, e.g. `4 layout · 5 data · 0 interaction · 2 a11y`.
 
 Regions:
-
-> One phrase per width: stack, two columns, main + sidebar, grid of N…
+> Each box on the design as a component, nested with `>`.
 
 Tiers:
-
-> Colours by role · spacing base and classes · type sizes · radius and shadow. Guide: [Reading tokens](/guides/reading-tokens)
+> A few words per width, e.g. `375 stack · 768 2 cols + full row · 1280 main + sidebar`.
 
 Tokens:
-
-> Open the data file now. Which arrays become `.map()`? Which values do you derive instead of reading?
+> Colours by role · spacing base and classes · type sizes · radius and shadow. Guide: [Reading tokens](/guides/reading-tokens)
 
 Data:
-
-> What changes when the user acts? Each piece and who owns it, or "none".
+> Open the data file now. Which arrays become `.map()`? Which values do you derive instead of reading?
 
 State:
-
-> What would you ask the interviewer?
+> What changes when the user acts? Each piece and who owns it, or "none".
 
 Questions:
+> What would you ask the interviewer?
 
 ## Where time went
 
@@ -85,3 +79,4 @@ Questions:
 Done, measured against the brief:
 Not done, and the order I'd do it in:
 Before this shipped I'd add:
+> One sentence each, after the colon.

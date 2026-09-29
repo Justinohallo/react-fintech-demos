@@ -12,7 +12,7 @@ __DATE__
 
 ## 5-minute analysis: regions, tokens, data shape, state
 
-> Five minutes. Stop at the cue.
+> Five minutes. Stop at the cue. Answers after the colon; Started and Finished are minutes on the rep timer.
 
 Started at:
 Finished at:
