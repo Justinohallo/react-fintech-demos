@@ -13,7 +13,7 @@ Run `npm run check -- NN N`. It saves `reviews/NN/attempt-N.check.json`. Use tha
 ## 2. Read
 
 - `src/app/challenges/NN/deliverable/attempt-N/page.jsx` and `notes.md`. **Read only. Never edit anything in the attempt folder.**
-  Notes may be guided, prompted or bare (SPEC.md §6). Ignore prompt lines (`> …`), unfilled slots (`Label:` with nothing after), unticked boxes and empty table cells: they are template, not answers.
+  Notes may be guided, prompted or bare (SPEC.md §6). Ignore prompt lines (whole italic lines `_…_`), unfilled slots (`Label:` with nothing after), unticked boxes and empty table cells: they are template, not answers. In notes written before prompts became italic, a `>` line is a prompt only if it matches the old template (`src/lib/legacyPrompts.ts`); any other `>` line is an answer.
 - `reviews/NN/attempt-N.lookups.md`, the help log, if there is one: every question asked during the rep. Count its entries as lookups alongside the notes' Lookups section, and read the categories for the Process section.
 - The `## NN —` section of `CHALLENGES.md`: ACs, accessibility items, Responsive list, reference analysis.
 - `tests/challenges/NN.spec.ts`, to explain precisely what a failed test expected.

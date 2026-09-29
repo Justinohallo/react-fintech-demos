@@ -4,15 +4,15 @@ __DATE__
 
 ## Rep minutes
 
-> A number.
+_A number._
 
 ## Phase reached at 60:00
 
-> Which of the five phases.
+_Which of the five phases._
 
 ## 5-minute analysis: regions, tokens, data shape, state
 
-> Five minutes. Stop at the cue. Answers after the colon; Started and Finished are minutes on the rep timer.
+_Five minutes. Stop at the cue. Answers after the colon; Started and Finished are minutes on the rep timer._
 
 Started at:
 Finished at:
@@ -36,12 +36,12 @@ Questions:
 
 ## Stalls
 
-> As they happen.
+_As they happen._
 
 ## Lookups (what I had to search or ask)
 
-> Costliest first.
+_Costliest first._
 
 ## What I'd do next
 
-> Your closing statement: done, not done, before shipping.
+_Your closing statement: done, not done, before shipping._

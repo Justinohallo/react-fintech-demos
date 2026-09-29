@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { ChallengeNumber } from "@/content/challenges";
+import { LEGACY_QUOTE_PROMPTS } from "./legacyPrompts";
 
 // Reads attempt folders from disk. Called only from server components that
 // prerender at build time, so the deployed site reflects committed attempts.
@@ -49,12 +50,14 @@ function readNotes(file: string): Pick<Attempt, "date" | "repMinutes" | "firstLi
 
 /**
  * True for a line the human actually wrote, false for template scaffolding
- * (SPEC.md §6): prompts (`> …`), unfilled slots (`Label:` with nothing after),
+ * (SPEC.md §6): prompts (italic lines, or template `>` lines in old notes), unfilled slots (`Label:` with nothing after),
  * checkbox lines, table rows, and lone list bullets.
  */
 export function isWritten(line: string): boolean {
   const l = line.trim();
-  if (!l || l.startsWith(">") || l.startsWith("|") || l === "-" || l === "*") return false;
+  if (!l || l.startsWith("|") || l === "-" || l === "*") return false;
+  if (/^_.+_$/.test(l)) return false; // prompt (italic line)
+  if (l.startsWith(">")) return !LEGACY_QUOTE_PROMPTS.has(l); // old notes: prompt only if it's the template's
   if (/^[-*]\s*\[[ xX]\]/.test(l)) return false;
   if (/^[^:]{1,60}:$/.test(l)) return false;
   return true;
