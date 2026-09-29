@@ -23,6 +23,12 @@ export type AcceptanceCriterion = {
   manual: boolean;
 };
 
+/** Bonus points, never a failure (SPEC.md §2). */
+export type A11yItem = {
+  id: string;
+  text: string;
+};
+
 export type ReferenceAnalysis = {
   tree: string;
   tokens: string;
@@ -40,6 +46,7 @@ export type Challenge = {
   dataFile: string;
   whatThisTests: string;
   acceptanceCriteria: AcceptanceCriterion[];
+  a11yBonus: A11yItem[];
   referenceAnalysis: ReferenceAnalysis;
 };
 
@@ -107,6 +114,16 @@ export const challenges: Challenge[] = [
         id: "C01-AC11",
         text: "Given a 1280px viewport, then \"Recent activity\" is below the balance card, and the \"Accounts\" card is to the right of both.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C01-A11Y1",
+        text: "The masked account number is exposed as text that includes \"ending in 4821\", so it is not read out as a run of bullets."
+      },
+      {
+        id: "C01-A11Y2",
+        text: "The avatar has an accessible name with the user's full name, not only their initials."
       }
     ],
     referenceAnalysis: {
@@ -183,6 +200,16 @@ export const challenges: Challenge[] = [
         manual: false
       }
     ],
+    a11yBonus: [
+      {
+        id: "C02-A11Y1",
+        text: "With focus on \"Monthly\", pressing the Right arrow key selects \"Annual\" and updates the prices."
+      },
+      {
+        id: "C02-A11Y2",
+        text: "The check icons in the feature lists are hidden from assistive tech; the feature text is the content."
+      }
+    ],
     referenceAnalysis: {
       tree: "`Header`, `PeriodToggle`, `PlanGrid > PlanCard > FeatureList`.",
       tokens: "`bg-zinc-950`, `bg-zinc-900`, `border-zinc-800`, `border-lime-400`, `text-zinc-50` / `zinc-400`, `rounded-2xl`. Spacing base 4: card padding 32, gaps 24.",
@@ -256,6 +283,16 @@ export const challenges: Challenge[] = [
         id: "C03-AC10",
         text: "Given a 768px or 1280px viewport, then \"•••• 7314\" is to the left of the \"Freeze card\" switch.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C03-A11Y1",
+        text: "When the user activates \"Copy number\", a status message \"Copied\" is announced."
+      },
+      {
+        id: "C03-A11Y2",
+        text: "The spend progressbar's value text reads \"<spent> of <limit>\", not a bare percentage."
       }
     ],
     referenceAnalysis: {
@@ -336,6 +373,16 @@ export const challenges: Challenge[] = [
         id: "C04-AC11",
         text: "Given a 1280px viewport, then the summary's \"Total debited\" line is to the right of the \"Amount\" field.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C04-A11Y1",
+        text: "When an Amount error is shown, the Amount field is marked invalid (`aria-invalid=\"true\"`)."
+      },
+      {
+        id: "C04-A11Y2",
+        text: "After a valid submit, focus moves to the \"Payment scheduled\" heading."
       }
     ],
     referenceAnalysis: {
@@ -422,6 +469,16 @@ export const challenges: Challenge[] = [
         manual: false
       }
     ],
+    a11yBonus: [
+      {
+        id: "C05-A11Y1",
+        text: "The allocation bar is exposed as an image whose accessible name lists each wallet and its share."
+      },
+      {
+        id: "C05-A11Y2",
+        text: "The \"▲\" / \"▼\" glyph is hidden from assistive tech, and the direction is given in words (\"up\" or \"down\")."
+      }
+    ],
     referenceAnalysis: {
       tree: "`Header > DenominationToggle`, `KpiRow > KpiTile × 3`, `AllocationBar > (Segment × 4, Legend)`, `HoldingsTable`.",
       tokens: "`bg-neutral-950` / `neutral-900`, `border-neutral-800`, `text-amber-400`, `text-green-400` / `red-400`, `rounded-sm`, `font-mono`, `tracking-widest uppercase text-[11px]` labels.",
@@ -500,6 +557,16 @@ export const challenges: Challenge[] = [
         id: "C06-AC11",
         text: "Given a 768px viewport, then the budget cards sit two per row. Given a 1280px viewport, three per row.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C06-A11Y1",
+        text: "Each progressbar's value text reads \"<spent> of <limit>\"."
+      },
+      {
+        id: "C06-A11Y2",
+        text: "After a new limit is saved, the card's new status is announced in a status message."
       }
     ],
     referenceAnalysis: {
@@ -583,6 +650,16 @@ export const challenges: Challenge[] = [
         id: "C07-AC11",
         text: "Given a 1280px viewport, then in the first row Date, Merchant, Category, Amount and \"Receipt attached\" are on one line.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C07-A11Y1",
+        text: "After a row is removed, focus moves to another control in the report (the next row's Date field, or \"Add line item\"), not to the page."
+      },
+      {
+        id: "C07-A11Y2",
+        text: "The policy panel is a status region, so a new violation is announced when it appears."
       }
     ],
     referenceAnalysis: {
@@ -672,6 +749,16 @@ export const challenges: Challenge[] = [
         id: "C08-AC12",
         text: "Given a 1280px viewport, then each row's Approve button is on the same line as its description. Given a 375px viewport, it is below it.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C08-A11Y1",
+        text: "After Approve or Reject on a row, focus moves to another row's control or to \"Undo\", not to the page."
+      },
+      {
+        id: "C08-A11Y2",
+        text: "While \"Undo\" has focus or the pointer is over the toast, it stays open past 5 seconds."
       }
     ],
     referenceAnalysis: {
@@ -764,6 +851,16 @@ export const challenges: Challenge[] = [
         manual: false
       }
     ],
+    a11yBonus: [
+      {
+        id: "C09-A11Y1",
+        text: "A table of the chart's data, one row per bar with its label and amount, is available visibly or to assistive tech."
+      },
+      {
+        id: "C09-A11Y2",
+        text: "With focus on a bar, the Left and Right arrow keys move focus to the previous and next bar."
+      }
+    ],
     referenceAnalysis: {
       tree: "`Header > RangeTabs`, `KpiRow`, `BarChart > (YAxis, Gridlines, BarGroup × n > (GhostBar, Bar), XAxis, Tooltip)`, `TopMerchants`.",
       tokens: "`bg-neutral-50`, `ring-1 ring-neutral-200`, `rounded-2xl`, `fill-blue-500` / `blue-700` / `neutral-300`, `stroke-neutral-200 stroke-dasharray`, `tabular-nums`.",
@@ -854,6 +951,16 @@ export const challenges: Challenge[] = [
         id: "C10-AC13",
         text: "Given a 1280px viewport, then every column header is visible.",
         manual: false
+      }
+    ],
+    a11yBonus: [
+      {
+        id: "C10-A11Y1",
+        text: "The results count (\"Showing n of 200\") is a status message, so each change is announced."
+      },
+      {
+        id: "C10-A11Y2",
+        text: "When the dialog closes after Save, a status message \"Memo saved\" is announced."
       }
     ],
     referenceAnalysis: {

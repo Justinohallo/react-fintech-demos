@@ -17,12 +17,13 @@ You are the **Builder**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `doc
 ## Rules
 
 - **One session, one task.** Tasks are listed in `SPEC.md` §8. Work only on the task you were given.
-- **No new dependencies** beyond those in `SPEC.md` §2 and ADR-001. Needing one is a blocker, not a decision.
+- **No new dependencies** beyond those in `SPEC.md` §2, ADR-001 and ADR-002. Needing one is a blocker, not a decision.
 - **Mocks are TypeScript (`.tsx`). Attempt pages are JavaScript (`.jsx`)** with no type annotations and no JSDoc types. Never convert an attempt file to TypeScript. Never lint-fix the contents of an attempt folder.
 - **Never write inside `src/app/challenges/*/deliverable/attempt-*`.** Those files belong to the human. The only exception is the attempt template and the script that copies it.
 - **A criterion is met only when a test named with its ID passes.** Commit messages name the task and the AC IDs they satisfy.
 - **Tests query by role, label and visible text only.** No class selectors, no `data-testid`, no DOM structure. The same spec file must grade both the mock and a hand-built attempt. If an AC cannot be tested that way, mark it `manual` in the spec file header instead of weakening the selector rule.
 - **Layout ACs measure, they don't locate.** A responsive AC may read the bounding box of an element found by role, label or text, and the page's scroll width. It never finds an element by its position.
+- **Accessibility bonus.** Axe audits the whole DOM; that is the engine, not a selector (ADR-002). Bonus tests are titled `A11Y-n` (universal) or `CNN-A11Yn` (challenge). Every mock must score full marks.
 - **Responsive, mobile-first, one breakpoint system** (`SPEC.md` §2). Base styles are mobile; override upward with `tablet:` and `desktop:` only. No `sm:`/`md:`/`lg:`/`xl:`/`2xl:` (they produce no CSS here), no `max-*` variants, no arbitrary `min-[…]:` queries.
 - **Money is integer minor units** (cents; satoshis for BTC) in data, formatted only at render with `Intl.NumberFormat`. No floats in data files.
 - **Dates are anchored to `KESTREL_TODAY = 2026-09-28`** from `src/lib/constants.ts`, never `new Date()`, so every rep sees the same data.

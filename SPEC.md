@@ -22,6 +22,7 @@ Attempts persist and deploy, so progress is visible over time. It must be usable
 - Tailwind, latest stable, configured CSS-first. Used for mocks, shell, and attempts.
 - Fonts through `next/font` only. Each mock may choose its own font as part of its visual direction.
 - Playwright, dev dependency only (ADR-001).
+- `@axe-core/playwright`, dev dependency only, for the accessibility bonus (ADR-002).
 - No other runtime or dev dependencies. No component libraries, icon packages, chart libraries, or state libraries. Icons are inline SVG. Charts are hand-drawn SVG.
 - Deployed on Vercel from `main`.
 
@@ -39,6 +40,25 @@ Every page in the set (shell, mocks and attempts) is responsive and mobile-first
 - Write mobile styles first, then override upward with `tablet:` and `desktop:`. No `max-*` variants and no arbitrary `min-[…]:` queries.
 - No page scrolls horizontally at any test viewport.
 - Each challenge's Layout section has a **Responsive** list saying what changes at each tier, and its ACs grade it.
+
+### Accessibility bonus
+
+Every rep also earns accessibility bonus points. They are reported next to the AC result and never fail a rep.
+
+**Universal checks** run on every challenge, from `tests/a11y.spec.ts`:
+
+| ID | Check |
+|---|---|
+| A11Y-1 | axe finds no violations tagged `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` or `wcag22aa` at 1280×800 |
+| A11Y-2 | The same at 375×812 |
+| A11Y-3 | Every enabled button, link, form control, switch and tab can be reached with Tab (one stop per radio group or tablist) |
+| A11Y-4 | Every such control visibly changes when it receives keyboard focus |
+| A11Y-5 | One `main` landmark, one level-1 heading, and no skipped heading levels |
+| A11Y-6 | At 320×640 (WCAG reflow), the page does not scroll horizontally |
+
+**Challenge items** (`CNN-A11Yn` in `CHALLENGES.md`) go beyond the ACs: announcements, focus management and keyboard patterns specific to that feature.
+
+The score is the checks and items passed, out of their total. Every mock scores full marks.
 
 ## 3. Routes
 
@@ -59,7 +79,7 @@ Built from `src/content/challenges.ts`. It has five sections, in this order:
 
 1. **Header:** number, title, difficulty, concept in one line.
 2. **What this tests:** the skills, from the challenge spec.
-3. **Requirements:** the acceptance criteria, listed with IDs.
+3. **Requirements:** the acceptance criteria, listed with IDs, then the accessibility bonus: the universal checks and the challenge's own items.
 4. **Actions:**
    - "Open mock" (new tab)
    - "Start rep", which starts the timer and shows the command `npm run attempt -- NN`
@@ -77,7 +97,7 @@ Render this content faithfully. Styling is the Builder's call within the shell's
 | 0–5 | **Read and plan** | Regions named, component tree said out loud, tokens pulled, questions asked |
 | 5–15 | **Skeleton** | Every region on screen as a box, laid out at all three tiers |
 | 15–40 | **Components and data** | Real content rendered from data, not hard-coded strings |
-| 40–50 | **Interaction and states** | The one core interaction works; hover, focus, empty, error states exist |
+| 40–50 | **Interaction and states** | The one core interaction works by mouse and keyboard; hover, focus, empty, error states exist |
 | 50–60 | **Polish and walkthrough** | Largest visual gaps closed; closing statement given |
 
 ### Analysing a view (the 5-minute worksheet)
@@ -118,6 +138,7 @@ Say the decision, then the reason. For example: "Grid here because the columns a
 - Storing derived values as state.
 - Building the desktop layout first and squeezing it down.
 - Reaching for `md:` or `lg:`, which produce no CSS in this set.
+- A clickable `div` where a `button` belongs.
 
 ## 6. Timer, attempts, rep log
 
@@ -151,12 +172,12 @@ The page template is a single `'use client'` component. It has an empty `<main>`
 - Lookups (what I had to search or ask)
 - What I'd do next
 
-**Check script (`npm run check -- NN [N]`).** Runs `tests/challenges/NN.spec.ts` with a base-path variable pointing at `/challenges/NN/mock`, or at `/challenges/NN/deliverable/attempt-N` when N is given. Prints pass/fail per AC ID.
+**Check script (`npm run check -- NN [N]`).** Runs `tests/challenges/NN.spec.ts` and `tests/a11y.spec.ts` with a base-path variable pointing at `/challenges/NN/mock`, or at `/challenges/NN/deliverable/attempt-N` when N is given. Prints pass/fail per AC ID, then the accessibility bonus per item, then one score line, e.g. `10/10 ACs · 7/8 a11y`. Only ACs affect the exit code.
 
 **`REPS.md`.** At the repository root. A table with columns:
 
-| Date | Challenge | Attempt | Minutes | Phase at 60 | ACs passed | Top lookup |
-|---|---|---|---|---|---|---|
+| Date | Challenge | Attempt | Minutes | Phase at 60 | ACs passed | A11y | Top lookup |
+|---|---|---|---|---|---|---|---|
 
 The human fills it in. The Builder only creates the header.
 
@@ -168,12 +189,14 @@ The human fills it in. The Builder only creates the header.
   - attempt pages are checked only for the layout's timer and "← Attempts" link, because the page's own heading belongs to the human
   - the timer starts, persists across a reload, and resets
   - the reveal on a brief page requires the confirm step
+- `tests/a11y.spec.ts` (T-1.2): the universal checks A11Y-1 to A11Y-6, one `test()` each, base path from the environment variable.
 - `tests/challenges/NN.spec.ts` (T-2 … T-11):
   - one `test()` per AC, titled with its ID, e.g. `C03-AC2 freeze disables reveal`
   - base path comes from the environment variable
   - selectors are role, label and text only (CLAUDE.md)
   - responsive ACs set the viewport to the tier they grade (375×812, 768×1024, 1280×800) and may measure bounding boxes and scroll width; all other ACs run at 1280×800
   - ACs marked `(manual)` in `CHALLENGES.md` are listed in a comment block at the top of the file, not tested
+  - the challenge's accessibility items are tests in the same file, titled with their `CNN-A11Yn` ID
 - **Screenshots.** Each mock is captured at 375×812, 768×1024 and 1280×800 into `docs/screenshots/NN/`, via a Playwright project that is not part of `check`.
 
 ## 8. Tasks
@@ -182,8 +205,9 @@ The human fills it in. The Builder only creates the header.
 |---|---|---|
 | T-1 | Scaffold, shell, framework page, timer, attempt and check scripts, content transcription, placeholders, smoke tests | — |
 | T-1.1 | Responsive standard: breakpoints in `globals.css`, shell and `/framework` on the standard, shared responsive test helpers, three-width screenshots | T-1 |
-| T-2 … T-11 | Mock, data, and AC suite for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.1 |
-| T-12 | QA pass in a fresh session: every AC suite passes against its mock, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
+| T-1.2 | Accessibility bonus: install `@axe-core/playwright` (ADR-002), `tests/a11y.spec.ts`, bonus scoring in the check script, brief pages list the bonus, `REPS.md` A11y column | T-1.1 |
+| T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
+| T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 
 ## 9. Not in scope
 

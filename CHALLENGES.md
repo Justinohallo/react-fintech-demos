@@ -11,6 +11,7 @@ Ten challenges, rising difficulty, one feature each. Every one is sized for a si
 - **Data** lives in `data/NN-<name>.json`. Money is integer minor units (`amountCents`, or `amountSats` for BTC). Dates are ISO strings on or before `2026-09-28`. The mock and the attempt import the same file.
 - **Acceptance criteria** are Given/When/Then with IDs `CNN-ACn`. Each must be testable by role, label, and visible text alone. `(manual)` marks one that a person judges from a screenshot.
 - **Responsive.** Every challenge is mobile-first on the three tiers in `SPEC.md` §2 (375, 768, 1280). The Visual direction describes the desktop design. Each Layout section's **Responsive** list says what changes at each tier. Where a challenge gives a max width, it is the desktop content width.
+- **Accessibility bonus** items have IDs `CNN-A11Yn`: what a careful build does beyond the ACs, testable by role, label and text. They earn bonus points alongside the universal checks in `SPEC.md` §2 and never fail a rep.
 - **Reference analysis** is what a good 5-minute read of the mock produces. It sits behind the reveal on the brief page.
 - **Fonts** come from `next/font/google`. Colours are given as Tailwind palette names so the token-mapping step has a right answer.
 
@@ -72,6 +73,11 @@ A top bar with the Kestrel wordmark (plain text), an "Operating account" label, 
 - **C01-AC9:** Given a 375px viewport, then the balance card, the "Accounts" card and "Recent activity" are stacked in that order.
 - **C01-AC10:** Given a 768px viewport, then the balance card and the "Accounts" card sit side by side, with "Recent activity" below both.
 - **C01-AC11:** Given a 1280px viewport, then "Recent activity" is below the balance card, and the "Accounts" card is to the right of both.
+
+### Accessibility bonus
+
+- **C01-A11Y1:** The masked account number is exposed as text that includes "ending in 4821", so it is not read out as a run of bullets.
+- **C01-A11Y2:** The avatar has an accessible name with the user's full name, not only their initials.
 
 ### Reference analysis
 
@@ -143,6 +149,11 @@ A centred heading "Plans for every stage" with a subheading. Below it, a Monthly
 - **C02-AC8:** Given a 375px viewport, then the recommended plan's card is first, and all three cards are stacked in one column.
 - **C02-AC9:** Given a 768px viewport, then the recommended plan's card spans the full row above the other two, which sit side by side.
 - **C02-AC10:** Given a 1280px viewport, then the three plan names sit on one row in the order Starter, Growth, Scale.
+
+### Accessibility bonus
+
+- **C02-A11Y1:** With focus on "Monthly", pressing the Right arrow key selects "Annual" and updates the prices.
+- **C02-A11Y2:** The check icons in the feature lists are hidden from assistive tech; the feature text is the content.
 
 ### Reference analysis
 
@@ -223,6 +234,11 @@ When frozen, the card face desaturates to grayscale and shows a "Frozen" badge.
 - **C03-AC9:** Given a 375px viewport, then "•••• 7314" is above the "Freeze card" switch.
 - **C03-AC10:** Given a 768px or 1280px viewport, then "•••• 7314" is to the left of the "Freeze card" switch.
 
+### Accessibility bonus
+
+- **C03-A11Y1:** When the user activates "Copy number", a status message "Copied" is announced.
+- **C03-A11Y2:** The spend progressbar's value text reads "<spent> of <limit>", not a bare percentage.
+
 ### Reference analysis
 
 - **Tree:** `CardFace > (Chip, NetworkMark, Number, Meta)`, `ControlsPanel > (RevealButton, FreezeSwitch, CopyButton, SpendMeter)`.
@@ -298,6 +314,11 @@ A summary box shows amount, fee, total debited, and remaining balance. A "Review
 - **C04-AC9:** Given a 375px viewport, then the "Instant" option is below the "Standard" option.
 - **C04-AC10:** Given a 768px viewport, then the "Instant" option is to the right of the "Standard" option.
 - **C04-AC11:** Given a 1280px viewport, then the summary's "Total debited" line is to the right of the "Amount" field.
+
+### Accessibility bonus
+
+- **C04-A11Y1:** When an Amount error is shown, the Amount field is marked invalid (`aria-invalid="true"`).
+- **C04-A11Y2:** After a valid submit, focus moves to the "Payment scheduled" heading.
 
 ### Reference analysis
 
@@ -376,6 +397,11 @@ A holdings table has columns Wallet, Balance, Share, and 24h. The price line und
 - **C05-AC10:** Given a 768px viewport, then "Total value", "24h change" and "Cost basis" sit on one row, and all four column headers are visible.
 - **C05-AC11:** Given a 1280px viewport, then the allocation legend is to the left of the holdings table.
 
+### Accessibility bonus
+
+- **C05-A11Y1:** The allocation bar is exposed as an image whose accessible name lists each wallet and its share.
+- **C05-A11Y2:** The "▲" / "▼" glyph is hidden from assistive tech, and the direction is given in words ("up" or "down").
+
 ### Reference analysis
 
 - **Tree:** `Header > DenominationToggle`, `KpiRow > KpiTile × 3`, `AllocationBar > (Segment × 4, Legend)`, `HoldingsTable`.
@@ -452,6 +478,11 @@ Editing replaces the limit text with a number input and Save / Cancel buttons.
 - **C06-AC10:** Given a 375px viewport, then the six progressbars are stacked in one column.
 - **C06-AC11:** Given a 768px viewport, then the budget cards sit two per row. Given a 1280px viewport, three per row.
 
+### Accessibility bonus
+
+- **C06-A11Y1:** Each progressbar's value text reads "<spent> of <limit>".
+- **C06-A11Y2:** After a new limit is saved, the card's new status is announced in a status message.
+
 ### Reference analysis
 
 - **Tree:** `Header > MonthSummary`, `BudgetGrid > BudgetCard > (CategoryIcon, Meter, StatusLine, LimitEditor)`.
@@ -526,6 +557,11 @@ A right-aligned summary shows subtotals by category, then a grand total. A polic
 - **C07-AC9:** Given a 375px viewport, then in the first row the Merchant field is below the Date field.
 - **C07-AC10:** Given a 768px viewport, then in the first row Date and Merchant sit side by side, and Amount is below them.
 - **C07-AC11:** Given a 1280px viewport, then in the first row Date, Merchant, Category, Amount and "Receipt attached" are on one line.
+
+### Accessibility bonus
+
+- **C07-A11Y1:** After a row is removed, focus moves to another control in the report (the next row's Date field, or "Add line item"), not to the page.
+- **C07-A11Y2:** The policy panel is a status region, so a new violation is announced when it appears.
 
 ### Reference analysis
 
@@ -609,6 +645,11 @@ Acting on a row removes it and shows the toast "<Approved|Rejected> <description
 - **C08-AC11:** Given a 768px or 1280px viewport, then the sidebar navigation is visible and there is no "Menu" button.
 - **C08-AC12:** Given a 1280px viewport, then each row's Approve button is on the same line as its description. Given a 375px viewport, it is below it.
 
+### Accessibility bonus
+
+- **C08-A11Y1:** After Approve or Reject on a row, focus moves to another row's control or to "Undo", not to the page.
+- **C08-A11Y2:** While "Undo" has focus or the pointer is over the toast, it stays open past 5 seconds.
+
 ### Reference analysis
 
 - **Tree:** `Sidebar`, `Header > (CountBadge, FilterTabs)`, `BulkBar`, `RequestList > RequestRow`, `Toast` (live region), `EmptyState`.
@@ -686,6 +727,11 @@ The range covers the most recent N days. The prior period is the N days before t
 - **C09-AC10:** Given a 375px viewport, then the KPIs sit two per row, and the chart is wider than the viewport while the page does not scroll horizontally.
 - **C09-AC11:** Given a 768px viewport, then the four KPIs sit on one row.
 - **C09-AC12:** Given a 1280px viewport, then "Top merchants" is to the right of the chart.
+
+### Accessibility bonus
+
+- **C09-A11Y1:** A table of the chart's data, one row per bar with its label and amount, is available visibly or to assistive tech.
+- **C09-A11Y2:** With focus on a bar, the Left and Right arrow keys move focus to the previous and next bar.
 
 ### Reference analysis
 
@@ -777,6 +823,11 @@ Default order is `postedAt` descending.
 - **C10-AC11:** Given a 375px viewport, then the "Cardholder", "Category" and "Status" column headers are hidden, and an opened dialog is as wide as the viewport.
 - **C10-AC12:** Given a 768px viewport, then the "Status" header is visible, "Cardholder" is hidden, and an opened dialog is 440px wide.
 - **C10-AC13:** Given a 1280px viewport, then every column header is visible.
+
+### Accessibility bonus
+
+- **C10-A11Y1:** The results count ("Showing n of 200") is a status message, so each change is announced.
+- **C10-A11Y2:** When the dialog closes after Save, a status message "Memo saved" is announced.
 
 ### Reference analysis
 
