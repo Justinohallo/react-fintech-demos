@@ -39,25 +39,38 @@ export function countAttempts(number: ChallengeNumber): number {
   return listAttempts(number).length;
 }
 
-/** Pull Date and Rep minutes from their sections, and the first line written under any other section. */
 function readNotes(file: string): Pick<Attempt, "date" | "repMinutes" | "firstLine"> {
-  let text: string;
   try {
-    text = fs.readFileSync(file, "utf8");
+    return summariseNotes(fs.readFileSync(file, "utf8"));
   } catch {
     return { date: null, repMinutes: null, firstLine: null };
   }
+}
 
+/**
+ * True for a line the human actually wrote, false for template scaffolding
+ * (SPEC.md §6): prompts (`> …`), unfilled slots (`Label:` with nothing after),
+ * checkbox lines, table rows, and lone list bullets.
+ */
+export function isWritten(line: string): boolean {
+  const l = line.trim();
+  if (!l || l.startsWith(">") || l.startsWith("|") || l === "-" || l === "*") return false;
+  if (/^[-*]\s*\[[ xX]\]/.test(l)) return false;
+  if (/^[^:]{1,60}:$/.test(l)) return false;
+  return true;
+}
+
+/** Date and Rep minutes from their sections, and the first line written under any other section. */
+export function summariseNotes(text: string): Pick<Attempt, "date" | "repMinutes" | "firstLine"> {
   const sections = new Map<string, string[]>();
   let current: string | null = null;
   for (const raw of text.split(/\r?\n/)) {
-    const line = raw.trim();
-    const heading = /^#{1,6}\s+(.*)$/.exec(line);
+    const heading = /^#{1,6}\s+(.*)$/.exec(raw.trim());
     if (heading) {
       current = heading[1].trim();
       sections.set(current, []);
-    } else if (current && line) {
-      sections.get(current)!.push(line);
+    } else if (current && isWritten(raw)) {
+      sections.get(current)!.push(raw.trim());
     }
   }
 

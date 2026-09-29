@@ -13,6 +13,7 @@ Run `npm run check -- NN N`. It saves `reviews/NN/attempt-N.check.json`. Use tha
 ## 2. Read
 
 - `src/app/challenges/NN/deliverable/attempt-N/page.jsx` and `notes.md`. **Read only. Never edit anything in the attempt folder.**
+  Notes may be guided, prompted or bare (SPEC.md §6). Ignore prompt lines (`> …`), unfilled slots (`Label:` with nothing after), unticked boxes and empty table cells: they are template, not answers.
 - The `## NN —` section of `CHALLENGES.md`: ACs, accessibility items, Responsive list, reference analysis.
 - `tests/challenges/NN.spec.ts`, to explain precisely what a failed test expected.
 - Every earlier review, `reviews/*/attempt-*.md`, for section 7 and for recurring tags.
@@ -37,7 +38,7 @@ focus: <at most three, separated by " | ">
 ---
 ```
 
-Where the notes leave `minutes`, `phase` or `analysis_minutes` blank, estimate from the attempt and the notes, and say "(estimated)" in the Process section.
+Take the values from the notes: `analysis_minutes` is `Finished at:` minus `Started at:` when both are filled. Where the notes leave `minutes`, `phase` or `analysis_minutes` blank, estimate from the attempt and the notes, and say "(estimated)" in the Process section.
 
 Then these sections, in order, as `##` headings:
 
@@ -45,7 +46,7 @@ Then these sections, in order, as `##` headings:
 2. `## What landed`: passed IDs, grouped by what they show.
 3. `## What didn't, and why`: every FAIL and MISSING ID with its cause, citing lines as `page.jsx:37`. Explain what the test expected.
 4. `## Against the reference analysis`: tree, tokens, breakpoints, state. Name every trap from the challenge's Traps list that the attempt hit.
-5. `## Process`: time per phase against §5, from the notes; stalls; lookups.
+5. `## Process`: time per phase against §5, from the notes. When the checkpoint table is filled, give it as target vs actual and name the first checkpoint that slipped. Then stalls and lookups. When the Guided self-check is present, note any box left unticked and whether the attempt agrees with the ticks.
 6. `## Accessibility`: the bonus result and the specific changes that would raise it.
 7. `## Compared with earlier reps`: the score trend and recurring tags, naming the earlier reviews. On the first review: "Baseline."
 8. `## Next rep`: the same focus points as the front matter, each specific enough to act on in the first ten minutes. Where a guide addresses the point (its `addresses` or `worksheet`), link it as `[Title](/guides/<slug>)`.
