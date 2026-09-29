@@ -110,6 +110,27 @@ Tiers     375 stack · 768 two columns · 1280 three columns
 
 Five lines, and each becomes classes you type later.
 
+## Applying type with `next/font`
+
+Fonts load through `next/font` only. Call it at module scope, then apply its `className`:
+
+```jsx
+import { Merriweather, Inter } from "next/font/google";
+
+const serif = Merriweather({ subsets: ["latin"], weight: ["400", "700"] });
+const sans = Inter({ subsets: ["latin"] });
+
+<div className={sans.className}>             {/* body font for everything inside */}
+  <h1 className={serif.className}>…</h1>      {/* the serif where the design uses it */}
+</div>
+```
+
+- Decide **serif or sans** for headings and for body first. Serifs have small strokes at the ends of letters; sans don't. That call matters more than the exact typeface.
+- In an interview, naming "a serif for headings, Inter for body" is a good answer. To find the exact face on a live page, Inspect, then Computed, then `font-family` (log it as a lookup).
+- Some fonts need an explicit `weight` list, as above; the error message says which.
+
+Then apply the scale from question 3: sizes, weights, a muted colour for meta text, and `tabular-nums` on money.
+
 ## Measuring without guessing
 
 - **Pixel sizes:** on macOS, press ⌘⇧4 and drag across a gap; it shows the size in pixels. On a Retina screen those are device pixels, so **halve them**.
