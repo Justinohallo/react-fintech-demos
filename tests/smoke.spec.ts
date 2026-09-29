@@ -3,6 +3,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { challenges } from "../src/content/challenges";
+import {
+  TIER_NAMES,
+  TIERS,
+  expectAbove,
+  expectLeftOf,
+  expectNoHorizontalScroll,
+  expectSameColumn,
+  expectSameRow,
+  setTier,
+} from "./support/responsive";
 
 async function visit(page: Page, route: string) {
   const response = await page.goto(route);
@@ -108,4 +118,34 @@ test("the reveal on a brief page requires the confirm step", async ({ page }) =>
   await page.getByRole("button", { name: "Reveal anyway" }).click();
   await expect(traps).toBeVisible();
   await expect(page.getByText("Rendering the full number and hiding it with CSS")).toBeVisible();
+});
+
+// SPEC.md §2: the shell is on the responsive standard too.
+test.describe("shell pages do not scroll horizontally at any tier", () => {
+  const shellRoutes = ["/", "/framework", "/challenges/10", "/challenges/10/deliverable"];
+  for (const tier of TIER_NAMES) {
+    test(`${tier} ${TIERS[tier].width}px`, async ({ page }) => {
+      await setTier(page, tier);
+      for (const route of shellRoutes) {
+        await visit(page, route);
+        await expectNoHorizontalScroll(page);
+      }
+    });
+  }
+});
+
+test("brief requirements reflow: ID above its text on mobile, beside it from tablet", async ({ page }) => {
+  const id = page.getByText("C01-AC1", { exact: true });
+  const text = page.getByText(/^Given the page loads, then a heading/);
+
+  await setTier(page, "mobile");
+  await visit(page, "/challenges/01");
+  await expectAbove(id, text);
+  await expectSameColumn(id, text);
+
+  for (const tier of ["tablet", "desktop"] as const) {
+    await setTier(page, tier);
+    await expectLeftOf(id, text);
+    await expectSameRow(id, text);
+  }
 });

@@ -3,4 +3,15 @@
 /*
  * Tailwind v4, configured CSS-first. No global colours or fonts here: each
  * mock and attempt owns its visual direction, and the shell styles itself.
+ *
+ * Responsive standard (SPEC.md §2): mobile-first on three tiers.
+ *   mobile   0–767px     base styles
+ *   tablet   768–1279px  tablet:
+ *   desktop  1280px+     desktop:
+ * Tailwind's default breakpoints are removed, so sm: md: lg: xl: 2xl: emit nothing.
  */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-tablet: 48rem;
+  --breakpoint-desktop: 80rem;
+}

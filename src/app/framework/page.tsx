@@ -7,9 +7,9 @@ export const metadata: Metadata = { title: "The method" };
 
 const PHASE_ROWS = [
   ["0–5", "Read and plan", "Regions named, component tree said out loud, tokens pulled, questions asked"],
-  ["5–15", "Skeleton", "Every region on screen as a box, layout correct at the target width"],
+  ["5–15", "Skeleton", "Every region on screen as a box, laid out at all three tiers"],
   ["15–40", "Components and data", "Real content rendered from data, not hard-coded strings"],
-  ["40–50", "Interaction and states", "The one core interaction works; hover, focus, empty, error states exist"],
+  ["40–50", "Interaction and states", "The one core interaction works by mouse and keyboard; hover, focus, empty, error states exist"],
   ["50–60", "Polish and walkthrough", "Largest visual gaps closed; closing statement given"],
 ] as const;
 
@@ -53,6 +53,10 @@ export default function FrameworkPage() {
             <li>Spacing: find the base unit, then check that the gaps are multiples of it.</li>
             <li>Type: count distinct sizes and weights. It is usually three or four.</li>
             <li>Radius and shadow.</li>
+            <li>
+              Breakpoints: what changes at <Code>tablet:</Code> (768) and at <Code>desktop:</Code> (1280)? Name the
+              layout at each tier.
+            </li>
             <li>Map each to a Tailwind value before writing markup.</li>
           </ul>
         </li>
@@ -71,7 +75,7 @@ export default function FrameworkPage() {
         <li>
           <strong>Questions to ask out loud.</strong>
           <ul className="mt-1 list-disc space-y-1 pl-5">
-            <li>Is this responsive, or fixed width?</li>
+            <li>What must work at each tier, and what can collapse or hide on mobile?</li>
             <li>Which interactions matter most?</li>
             <li>Is the data static or should I model it?</li>
             <li>Can I use the platform&rsquo;s native controls?</li>
@@ -103,6 +107,13 @@ export default function FrameworkPage() {
         <li>Pixel-pushing before every region exists.</li>
         <li>Silence for more than a minute.</li>
         <li>Storing derived values as state.</li>
+        <li>Building the desktop layout first and squeezing it down.</li>
+        <li>
+          Reaching for <Code>md:</Code> or <Code>lg:</Code>, which produce no CSS in this set.
+        </li>
+        <li>
+          A clickable <Code>div</Code> where a <Code>button</Code> belongs.
+        </li>
       </ul>
     </Shell>
   );
@@ -110,4 +121,8 @@ export default function FrameworkPage() {
 
 function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="mt-10 mb-3 text-xl font-semibold tracking-tight">{children}</h2>;
+}
+
+function Code({ children }: { children: React.ReactNode }) {
+  return <code className="rounded bg-stone-100 px-1 py-0.5 font-mono text-[0.85em] text-stone-800">{children}</code>;
 }

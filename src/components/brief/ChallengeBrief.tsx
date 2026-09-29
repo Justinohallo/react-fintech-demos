@@ -29,8 +29,8 @@ export function ChallengeBrief({ number }: { number: ChallengeNumber }) {
       <Section title="Requirements">
         <ul className="divide-y divide-stone-200 rounded-xl border border-stone-200 bg-white">
           {c.acceptanceCriteria.map((ac) => (
-            <li key={ac.id} className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:gap-4">
-              <span className="shrink-0 font-mono text-xs leading-6 text-stone-500 sm:w-20">{ac.id}</span>
+            <li key={ac.id} className="flex flex-col gap-1 px-4 py-3 tablet:flex-row tablet:gap-4">
+              <span className="shrink-0 font-mono text-xs leading-6 text-stone-500 tablet:w-20">{ac.id}</span>
               <span className="leading-relaxed text-stone-800">
                 <InlineCode text={ac.text} />
                 {ac.manual && (

@@ -75,17 +75,29 @@ const results = [];
   }
 })(report.suites);
 
-// Manual ACs are listed in the spec file's header comment, not tested.
-const header = /^\s*\/\*[\s\S]*?\*\//.exec(fs.readFileSync(path.join(root, spec), "utf8"))?.[0] ?? "";
-const manual = [...new Set(header.match(/C\d\d-AC\d+/g) ?? [])].filter(
-  (id) => !results.some((r) => r.title.startsWith(id)),
-);
+// Every AC comes from challenges.ts (the transcription of CHALLENGES.md). An
+// AC with no test is MISSING, and counts as unmet: a criterion is met only when
+// a test named with its ID passes (CLAUDE.md). Manual ACs are listed, not tested.
+const content = fs.readFileSync(path.join(root, "src/content/challenges.ts"), "utf8");
+const acs = [...content.matchAll(/id: "(C(\d\d)-AC\d+)",\s*text: "(?:[^"\\]|\\.)*",\s*manual: (true|false)/g)]
+  .filter((m) => m[2] === nn)
+  .map((m) => ({ id: m[1], manual: m[3] === "true" }));
+if (acs.length === 0) fail(`No acceptance criteria found for challenge ${nn} in src/content/challenges.ts`);
+const tested = (id) => results.some((r) => r.title === id || r.title.startsWith(`${id} `));
+const manual = acs.filter((a) => a.manual).map((a) => a.id);
+const missing = acs.filter((a) => !a.manual && !tested(a.id)).map((a) => a.id);
 
 const byId = (a, b) => a.title.localeCompare(b.title, "en", { numeric: true });
 console.log("\nAcceptance criteria");
 for (const r of results.sort(byId)) console.log(`  ${r.status}    ${r.title}`);
+for (const id of missing) console.log(`  MISSING ${id}   (no test titled with this ID)`);
 for (const id of manual) console.log(`  MANUAL  ${id}`);
 
-const passed = results.filter((r) => r.status === "PASS").length;
-console.log(`\n${passed}/${results.length} passed${manual.length ? `, ${manual.length} manual` : ""}`);
-process.exit(run.status === 0 && passed === results.length ? 0 : 1);
+const graded = acs.length - manual.length;
+const passed = results.filter((r) => r.status === "PASS" && /^C\d\d-AC\d+/.test(r.title)).length;
+console.log(
+  `\n${passed}/${graded} ACs passed` +
+    (missing.length ? `, ${missing.length} missing` : "") +
+    (manual.length ? `, ${manual.length} manual` : ""),
+);
+process.exit(run.status === 0 && passed === graded ? 0 : 1);
