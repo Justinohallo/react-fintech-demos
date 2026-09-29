@@ -1,4 +1,17 @@
-# Kickoff prompt — paste into Claude Code
+# Kickoff — Kestrel practice set
+
+## The short version
+
+From the repo root:
+
+1. `claude`, then type `/t1`. This is one interactive session. Answer anything it asks, then link Vercel when it says it's ready.
+2. `scripts/build-mocks.sh` builds challenges 01–10 headlessly, one fresh session each, and stops at the first blocker. Resume with `scripts/build-mocks.sh 4 10`.
+3. For a single challenge, run `claude`, then `/challenge 04`.
+
+The prompts live in `.claude/commands/t1.md` and `.claude/commands/challenge.md`. Permissions are in `.claude/settings.json`: the Builder can run npm, npx and git commit, but is denied edits to `SPEC.md`, `CHALLENGES.md` and `docs/adr/`, and denied `git push`. The seat separation is enforced by the harness, not just by the prompt.
+
+The full prompt text is kept below for reference.
+
 
 The repo is already laid out: `CLAUDE.md`, `SPEC.md` and `CHALLENGES.md` at the root, `docs/adr/001-playwright.md`, and this file at `docs/KICKOFF.md`. Open Claude Code in the repo root and paste everything below the line.
 

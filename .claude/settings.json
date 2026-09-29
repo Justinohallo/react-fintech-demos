@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(cat:*)",
+      "Edit",
+      "Write",
+      "Read",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Edit(/SPEC.md)",
+      "Write(/SPEC.md)",
+      "Edit(/CHALLENGES.md)",
+      "Write(/CHALLENGES.md)",
+      "Edit(/docs/adr/**)",
+      "Write(/docs/adr/**)",
+      "Bash(git push:*)"
+    ]
+  }
+}
