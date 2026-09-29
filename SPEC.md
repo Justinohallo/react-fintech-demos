@@ -6,7 +6,7 @@
 
 A public site on Vercel where a timed rep runs end to end:
 
-1. Read the method.
+1. Read the method, and the guides it points to.
 2. Open a challenge.
 3. Analyse the mock using the worksheet.
 4. Start the timer.
@@ -65,12 +65,14 @@ The score is the checks and items passed, out of their total. Every mock scores 
 | Route | Language | Purpose |
 |---|---|---|
 | `/` | TS | Index. Kestrel practice set title. The ten challenges as a list with number, title, concept, difficulty 1–10, and attempt count. Link to `/framework`. Footer: "Kestrel is a fictional company. Designs and data are invented for practice." |
-| `/framework` | TS | The method (§5). Readable in two minutes. Linked from every page header. |
+| `/framework` | TS | The method (§5). Readable in two minutes. Linked from every page header. Each worksheet step with a guide links to it. |
 | `/challenges/NN` | TS | Challenge brief (§4). |
 | `/challenges/NN/mock` | TS | The reference implementation, full-bleed, no app chrome except a small floating "← Brief" link in a corner. |
 | `/challenges/NN/deliverable` | TS | Attempt index: every attempt folder for NN, newest first, with date, rep minutes if recorded, and the first non-empty line written under any notes heading other than Date and Rep minutes. When the attempt has a review, its score (`4/10 ACs · 5/8 a11y`) and a link to it. Links to each attempt. Shows the command to create the next one. Reads the filesystem at build time. |
-| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
+| `/progress` | TS | Every reviewed rep in date order: challenge, attempt, AC and a11y scores, phase reached, analysis minutes. A hand-drawn SVG chart of AC and a11y percentages by rep. Issue tags counted across the last five reps and all time, each linking to the guides that address it. The latest review's focus list. Linked from every page header. Reads `reviews/` at build time. |
 | `/progress/NN/N` | TS | One review, rendered. |
+| `/guides` | TS | The curriculum: every guide, grouped by unit in unit order, each with its title and summary. Linked from every page header. Reads `guides/` at build time. |
+| `/guides/<slug>` | TS | One guide, rendered, with links to the previous and next guide in the curriculum. |
 | `/challenges/NN/deliverable/attempt-N` | **JSX** | An attempt. Its layout (TS) supplies only the floating timer and a "← Attempts" link. The page itself is the human's. |
 
 `NN` is zero-padded, `01`–`10`. Use static folders per challenge, not a dynamic segment, so attempt folders can sit under them.
@@ -239,6 +241,27 @@ Sections, in order:
 | `a11y-item-skipped` | A challenge accessibility item was not attempted |
 | `focus-management` | Focus lost, not moved, or not returned |
 
+**Guides (`guides/<slug>.md`).** The curriculum. It grows over time: adding a guide is adding a file. Front matter, one `key: value` per line:
+
+```
+---
+title: Reading tokens
+unit: Analysis
+unit_order: 1
+order: 2
+summary: Turn a picture into a short list of Tailwind classes before writing markup.
+addresses: analysis-overrun, hard-coded-data
+worksheet: tokens
+---
+```
+
+- `unit` groups guides; `unit_order` orders units; `order` orders guides within a unit. Units are Analysis, Layout, Data and state, Interaction, and Accessibility, and more may be added.
+- `addresses` lists the issue tags (above) the guide helps fix. `/progress` links each tag to its guides.
+- `worksheet` (optional) names the §5 worksheet step the guide expands: `regions`, `tokens`, `data`, `state`, `states`, or `questions`. `/framework` links that step to it.
+- The body is Markdown: `##` sections, lists, tables and code. Examples are invented; a guide never contains a challenge's reference analysis, tokens, layout or data.
+
+**Guide command (`/guide <topic>`).** A Claude Code command that drafts a new guide in this format, from the conversation and the human's notes, for the human to review before committing.
+
 ## 7. Tests
 
 - `tests/smoke.spec.ts` (T-1):
@@ -265,6 +288,7 @@ Sections, in order:
 | T-1.1 | Responsive standard: breakpoints in `globals.css`, shell and `/framework` on the standard, shared responsive test helpers, three-width screenshots | T-1 |
 | T-1.2 | Accessibility bonus: install `@axe-core/playwright` (ADR-002), `tests/a11y.spec.ts`, bonus scoring in the check script, brief pages list the bonus, `REPS.md` A11y column | T-1.1 |
 | T-1.3 | Rep reviews: the check script saves attempt results, the `/review` command, review scores and links on attempt indexes, `/progress` and `/progress/NN/N`, a Progress link in the page header; backfill the review of challenge 01 attempt 1 | T-1.2 |
+| T-1.4 | Guides: `/guides` and `/guides/<slug>`, a Guides link in the page header, worksheet links on `/framework`, guide links beside recurring issues on `/progress`, the `/guide` command; first guides "The 5-minute read" and "Reading tokens" | T-1.3 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
 | T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
 

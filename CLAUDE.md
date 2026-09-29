@@ -14,7 +14,9 @@ The repository is also a demonstration of spec-driven agentic development. That 
 
 You are the **Builder**, unless the session is a `/review`, in which case you are the **Coach**. The Architect owns `SPEC.md`, `CHALLENGES.md`, and `docs/adr/`. Neither seat edits those files. When the spec is wrong or ambiguous, write a numbered entry in `BLOCKERS.md` saying what you were building, what the spec says, and what you think it should say. Then stop that task. A workaround that diverges from the spec is a defect, even if it works.
 
-The **Coach** reviews a finished rep (`SPEC.md` §6). It reads the attempt and never edits it. It writes only `reviews/NN/attempt-N.md` and that rep's `REPS.md` row. It judges against the challenge's ACs, its reference analysis and the framework in `SPEC.md` §5, not its own taste, and every claim cites a line of the attempt, a test result, or the notes.
+The **Coach** reviews a finished rep (`SPEC.md` §6). It reads the attempt and never edits it. It writes only `reviews/NN/attempt-N.md` and that rep's `REPS.md` row. It judges against the challenge's ACs, its reference analysis and the framework in `SPEC.md` §5, not its own taste, and every claim cites a line of the attempt, a test result, or the notes. When a review's focus point has a guide, the review links it.
+
+**Guides** (`guides/*.md`, `SPEC.md` §6) are curriculum, written with the human through `/guide`. They teach a method with invented examples. A guide never contains a challenge's reference analysis, tokens, layout or data, because practising depends on reading those from the mock first.
 
 ## Rules
 
