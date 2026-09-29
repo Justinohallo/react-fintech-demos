@@ -8,8 +8,22 @@ export const metadata: Metadata = { title: "01 · Treasury balance · Mock" };
 const fraunces = Fraunces({ subsets: ["latin"], display: "swap" });
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
+const USER_NAME = "Priya Raman";
+
 const card = "rounded-xl border border-stone-200 bg-white p-6";
+const cardTitle = `${fraunces.className} text-lg font-medium`;
 const tone = (cents: number) => (cents < 0 ? "text-rose-700" : "text-emerald-700");
+
+// One grid, three tiers: the areas move, the cards are rendered once.
+//   mobile   balance / accounts / activity
+//   tablet   balance accounts / activity activity           (1fr 1fr)
+//   desktop  balance accounts / activity accounts           (2fr 1fr)
+const grid = [
+  "grid grid-cols-1 gap-6",
+  "[grid-template-areas:'balance'_'accounts'_'activity']",
+  "tablet:grid-cols-2 tablet:[grid-template-areas:'balance_accounts'_'activity_activity']",
+  "desktop:grid-cols-[2fr_1fr] desktop:[grid-template-areas:'balance_accounts'_'activity_accounts']",
+].join(" ");
 
 export default function Mock() {
   const { account, accounts, transactions } = data;
@@ -20,47 +34,41 @@ export default function Mock() {
   const totalCents = accounts.reduce((sum, a) => sum + a.balanceCents, 0);
 
   return (
-    <div className={`${inter.className} min-h-screen min-w-[1280px] bg-stone-50 text-stone-900`}>
-      <div className="mx-auto w-[1280px] p-8">
-        <TopBar />
+    <div className={`${inter.className} min-h-screen bg-stone-50 text-stone-900`}>
+      <div className="mx-auto max-w-[1280px] p-4 tablet:p-6 desktop:p-8">
+        <header className="flex items-center justify-between">
+          <span className={`${fraunces.className} text-xl font-semibold tracking-tight`}>Kestrel</span>
+          <span className="hidden text-sm text-stone-500 tablet:block">Operating account</span>
+          <span
+            role="img"
+            aria-label={`Signed in as ${USER_NAME}`}
+            className="grid size-9 place-items-center rounded-full bg-stone-200 text-xs font-medium text-stone-700"
+          >
+            {USER_NAME.split(" ").map((part) => part[0]).join("")}
+          </span>
+        </header>
 
-        <div className="mt-8 grid grid-cols-[2fr_1fr] items-start gap-6">
-          <div className="flex flex-col gap-6">
-            <section className={card}>
-              <h1 className={`${fraunces.className} text-lg font-medium`}>{account.name}</h1>
-              <p className={`${fraunces.className} mt-4 text-4xl font-medium tracking-tight tabular-nums`}>
-                {formatUSD(account.balanceCents)}
-              </p>
-              <p className={`mt-2 text-sm tabular-nums ${tone(changeCents)}`}>
-                {formatSignedUSD(changeCents)}
-                {changePercent && ` (${changePercent})`}
-                <span className="text-stone-500"> vs last month</span>
-              </p>
-              <p className="mt-6 text-xs text-stone-500">Account number •••• {account.last4}</p>
-            </section>
+        <main className={`mt-6 desktop:mt-8 ${grid}`}>
+          <section className={`${card} [grid-area:balance]`} aria-labelledby="balance-heading">
+            <h1 id="balance-heading" className={cardTitle}>
+              {account.name}
+            </h1>
+            <p className={`${fraunces.className} mt-4 text-4xl font-medium tracking-tight tabular-nums`}>
+              {formatUSD(account.balanceCents)}
+            </p>
+            <p className={`mt-2 text-sm tabular-nums ${tone(changeCents)}`}>
+              {formatSignedUSD(changeCents)}
+              {changePercent && ` (${changePercent})`}
+              <span className="text-stone-500"> vs last month</span>
+            </p>
+            <p className="mt-6 text-xs text-stone-500">
+              <span aria-hidden>Account number •••• {account.last4}</span>
+              <span className="sr-only">Account number ending in {account.last4}</span>
+            </p>
+          </section>
 
-            <section className={card}>
-              <h2 className={`${fraunces.className} text-lg font-medium`}>Recent activity</h2>
-              <ul aria-label="Recent activity" className="mt-4 divide-y divide-stone-200">
-                {transactions.map((t) => (
-                  <li key={t.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
-                    <div>
-                      <p className="text-sm font-medium">{t.merchant}</p>
-                      <p className="mt-0.5 text-xs text-stone-500">
-                        {t.category} · {formatDate(t.date)}
-                      </p>
-                    </div>
-                    <p className={`text-sm font-medium tabular-nums ${tone(t.amountCents)}`}>
-                      {formatSignedUSD(t.amountCents)}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
-
-          <section className={card} aria-labelledby="accounts-heading">
-            <h2 id="accounts-heading" className={`${fraunces.className} text-lg font-medium`}>
+          <section className={`${card} [grid-area:accounts] desktop:self-start`} aria-labelledby="accounts-heading">
+            <h2 id="accounts-heading" className={cardTitle}>
               Accounts
             </h2>
             <ul className="mt-4 divide-y divide-stone-200">
@@ -76,24 +84,29 @@ export default function Mock() {
               <span className="text-sm font-medium tabular-nums">{formatUSD(totalCents)}</span>
             </div>
           </section>
-        </div>
+
+          <section className={`${card} [grid-area:activity]`} aria-labelledby="activity-heading">
+            <h2 id="activity-heading" className={cardTitle}>
+              Recent activity
+            </h2>
+            <ul aria-label="Recent activity" className="mt-4 divide-y divide-stone-200">
+              {transactions.map((t) => (
+                <li key={t.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{t.merchant}</p>
+                    <p className="mt-0.5 text-xs text-stone-500">
+                      {t.category} · {formatDate(t.date)}
+                    </p>
+                  </div>
+                  <p className={`shrink-0 text-sm font-medium tabular-nums ${tone(t.amountCents)}`}>
+                    {formatSignedUSD(t.amountCents)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </main>
       </div>
     </div>
-  );
-}
-
-function TopBar() {
-  return (
-    <header className="flex items-center justify-between">
-      <span className={`${fraunces.className} text-xl font-semibold tracking-tight`}>Kestrel</span>
-      <span className="text-sm text-stone-500">Operating account</span>
-      <span
-        aria-label="Signed in as Priya Raman"
-        role="img"
-        className="grid size-9 place-items-center rounded-full bg-stone-200 text-xs font-medium text-stone-700"
-      >
-        PR
-      </span>
-    </header>
   );
 }
