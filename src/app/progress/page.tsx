@@ -7,6 +7,7 @@ import { REVIEW_TAGS, type ReviewTag } from "@/content/reviewTags";
 import { CODE_DIMENSIONS, DIMENSION_KEYS, SEVERITY_KEYS } from "@/content/codeReview";
 import { getCodeReview } from "@/lib/codeReviews";
 import { guidesForTag } from "@/lib/guides";
+import { LOOKUP_CATEGORIES, getLookups, type LookupCategory } from "@/lib/lookups";
 import { formatScore, listReviews } from "@/lib/reviews";
 
 export const metadata: Metadata = { title: "Progress" };
@@ -33,6 +34,16 @@ export default function ProgressPage() {
       codeReviews.reduce((n, { code }) => n + code.comments.filter((c) => c.category === d && c.severity === s).length, 0),
     ),
   }));
+  const lookupsByRep = new Map(reviews.map((r) => [`${r.challenge}-${r.attempt}`, getLookups(r.challenge, r.attempt)]));
+  const lookupCounts = (subset: typeof reviews) => {
+    const counts = new Map<LookupCategory, number>();
+    for (const r of subset)
+      for (const l of lookupsByRep.get(`${r.challenge}-${r.attempt}`) ?? []) counts.set(l.category, (counts.get(l.category) ?? 0) + 1);
+    return counts;
+  };
+  const recentLookups = lookupCounts(reviews.slice(-5));
+  const allLookups = lookupCounts(reviews);
+  const lookupCategories = [...allLookups.keys()].sort((a, b) => allLookups.get(b)! - allLookups.get(a)!);
   const tags = [...allTime.keys()].sort(
     (a, b) => (recent.get(b) ?? 0) - (recent.get(a) ?? 0) || allTime.get(b)! - allTime.get(a)!,
   );
@@ -79,7 +90,7 @@ export default function ProgressPage() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-stone-100 text-stone-600">
                   <tr>
-                    {["Date", "Challenge", "Attempt", "ACs", "A11y", "Phase at 60", "Analysis", "Review"].map((h) => (
+                    {["Date", "Challenge", "Attempt", "ACs", "A11y", "Phase at 60", "Analysis", "Lookups", "Review"].map((h) => (
                       <th key={h} scope="col" className="px-3 py-2 font-medium whitespace-nowrap">
                         {h}
                       </th>
@@ -98,6 +109,7 @@ export default function ProgressPage() {
                       <td className="px-3 py-2 whitespace-nowrap">
                         {r.analysisMinutes !== null ? `${r.analysisMinutes} min` : "–"}
                       </td>
+                      <td className="px-3 py-2">{lookupsByRep.get(`${r.challenge}-${r.attempt}`)?.length ?? "–"}</td>
                       <td className="px-3 py-2">
                         <Link
                           href={`/progress/${r.challenge}/${r.attempt}`}
@@ -169,6 +181,35 @@ export default function ProgressPage() {
                             {n}
                           </td>
                         ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {lookupCategories.length > 0 && (
+            <section className="mt-10">
+              <h2 className="text-xl font-semibold tracking-tight">What you look up</h2>
+              <p className="mt-2 text-sm text-stone-600">
+                Questions asked during reps, from the help logs. A category that shrinks is knowledge that stuck.
+              </p>
+              <div role="region" aria-label="Lookups by category" tabIndex={0} className="relative mt-4 overflow-x-auto rounded-xl border border-stone-200 bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-stone-100 text-stone-600">
+                    <tr>
+                      <th scope="col" className="px-3 py-2 font-medium">Category</th>
+                      <th scope="col" className="px-3 py-2 text-right font-medium whitespace-nowrap">Last 5</th>
+                      <th scope="col" className="px-3 py-2 text-right font-medium whitespace-nowrap">All time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-200 tabular-nums">
+                    {lookupCategories.map((c) => (
+                      <tr key={c}>
+                        <th scope="row" className="px-3 py-2 font-medium">{LOOKUP_CATEGORIES[c]}</th>
+                        <td className="px-3 py-2 text-right">{recentLookups.get(c) ?? 0}</td>
+                        <td className="px-3 py-2 text-right">{allLookups.get(c)}</td>
                       </tr>
                     ))}
                   </tbody>

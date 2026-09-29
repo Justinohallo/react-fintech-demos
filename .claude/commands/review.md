@@ -14,6 +14,7 @@ Run `npm run check -- NN N`. It saves `reviews/NN/attempt-N.check.json`. Use tha
 
 - `src/app/challenges/NN/deliverable/attempt-N/page.jsx` and `notes.md`. **Read only. Never edit anything in the attempt folder.**
   Notes may be guided, prompted or bare (SPEC.md §6). Ignore prompt lines (`> …`), unfilled slots (`Label:` with nothing after), unticked boxes and empty table cells: they are template, not answers.
+- `reviews/NN/attempt-N.lookups.md`, the help log, if there is one: every question asked during the rep. Count its entries as lookups alongside the notes' Lookups section, and read the categories for the Process section.
 - The `## NN —` section of `CHALLENGES.md`: ACs, accessibility items, Responsive list, reference analysis.
 - `tests/challenges/NN.spec.ts`, to explain precisely what a failed test expected.
 - Every earlier review, `reviews/*/attempt-*.md`, for section 7 and for recurring tags.
@@ -68,12 +69,13 @@ The code review, as a senior engineer would review a pull request (SPEC.md §6, 
 
 In `REPS.md`, write one row for this rep, replacing any existing row for the same challenge and attempt:
 
-`| <date> | NN | N | <minutes> | <phase> | <acs> | <a11y> | <top lookup from the notes> |`
+`| <date> | NN | N | <minutes> | <phase> | <acs> | <a11y> | <top lookup: whichever cost the most time, from the notes or the help log> |`
 
 ## 5. Commit
 
 ```
 git add reviews/NN/attempt-N.md reviews/NN/attempt-N.code.md reviews/NN/attempt-N.check.json REPS.md
+git add reviews/NN/attempt-N.lookups.md   # if the rep has a help log
 git commit -m "Review NN attempt N: <acs> ACs · <a11y> a11y"
 ```
 
