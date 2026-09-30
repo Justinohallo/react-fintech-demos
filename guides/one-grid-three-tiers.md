@@ -40,6 +40,25 @@ How to read the arbitrary value:
 - A name repeated across rows or columns spans them: `'summary_summary'` makes `summary` two columns wide, and `'summary_chart'_'summary_list'` makes it two rows tall.
 - The number of columns in the areas must match `grid-cols-*`.
 
+### What the underscores become
+
+Every underscore becomes a space, wherever it sits. The class, then the CSS Tailwind writes for it:
+
+```
+tablet:[grid-template-areas:'summary_summary'_'chart_list']
+```
+
+```css
+grid-template-areas: 'summary summary' 'chart list';
+```
+
+- An underscore **between** strings becomes the space that separates **rows**.
+- An underscore **inside** a string becomes the space that separates **columns**.
+
+You can't type a real space because `className` is split on spaces: `[grid-template-areas:'summary' 'chart']` becomes two broken classes, and Tailwind generates nothing and doesn't warn you. The same rule applies to every arbitrary value: `grid-cols-[1fr_2fr]` is `1fr 2fr`. For a literal underscore, write `\_`.
+
+To confirm, select the element in DevTools and find the rule under Styles. If it isn't there, the class didn't parse.
+
 Name areas by **content** (`summary`, `list`), not position (`sec1`). Then the template reads like your plan's Tiers line.
 
 ## Mobile first, always
