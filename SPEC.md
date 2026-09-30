@@ -60,6 +60,18 @@ Every rep also earns accessibility bonus points. They are reported next to the A
 
 The score is the checks and items passed, out of their total. Every mock scores full marks.
 
+### Reference code
+
+A mock is the code the human reads after a rep, as the answer. So it follows the practices the guides teach (every guide with a `code` field) and would score 3 on every dimension of the code review rubric (§6):
+
+- The page reads the data once, owns the landmarks, and places each section with a `className`. Each section is a component that owns its `<section>`, heading, `id` and list.
+- Generic wrappers, such as a card box, carry no semantics of their own.
+- Money and dates go through helpers. Totals and changes are derived in the component that shows them, never stored.
+- Lists are keyed by an id from the data, and named by their heading with `aria-labelledby`.
+- Tailwind's scale is used wherever it has the value (`max-w-7xl`, not `max-w-[1280px]`).
+
+When a guide adds or changes a practice, the mocks already built are checked against it in the same task. A refactor for this keeps the output: the check result and the screenshots are unchanged.
+
 ## 3. Routes
 
 | Route | Language | Purpose |
@@ -359,7 +371,7 @@ worksheet: tokens
 | T-1.6 | Code review: the code review format read by the site, annotated source and rubric on `/progress/NN/N`, rubric and category counts on `/progress`, `/review` writes it; Code craft guides "Composing components", "Props and money" and "Tailwind utilities that bite"; backfill code reviews of challenge 01 attempts 1 and 2 | T-1.5 |
 | T-1.7 | Help logs: shown on `/progress/NN/N`, lookups per rep and by category on `/progress`, read by `/review` | T-1.6 |
 | T-2 … T-11 | Mock, data, AC suite and accessibility items for challenge 01 … 10 (T-n builds challenge n−1). T-2 is rebuilt under the responsive standard. | T-1.2 |
-| T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, no forbidden branding, no dependency drift | T-2 … T-11 |
+| T-12 | QA pass in a fresh session: every AC suite passes against its mock, every mock scores full accessibility marks, screenshots match Visual directions, every mock's code meets §2 **Reference code**, no forbidden branding, no dependency drift | T-2 … T-11 |
 
 ## 9. Not in scope
 

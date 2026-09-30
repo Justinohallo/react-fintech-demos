@@ -86,7 +86,7 @@ A top bar with the Kestrel wordmark (plain text), an "Operating account" label, 
 - **Breakpoints:** one grid whose areas change per tier: `balance / accounts / activity`, then `tablet:` `balance accounts / activity activity`, then `desktop:` `balance accounts / activity accounts` at `2fr 1fr`. Padding `p-4 tablet:p-6 desktop:p-8`.
 - **State:** none. The change, the percentage, and the total are all derived.
 - **Traps:**
-  - Formatting with `toFixed` and a hand-placed `$` breaks negatives and separators. Build one `formatUSD` helper first.
+  - Formatting with `toFixed` and a hand-placed `$` breaks negatives and separators. Build one `formatMoney` helper first.
   - Dividing by the previous balance without guarding zero.
   - Rendering the Accounts card twice, once per tier, instead of moving one card with grid areas or `order`.
 

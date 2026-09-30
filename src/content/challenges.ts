@@ -134,7 +134,7 @@ export const challenges: Challenge[] = [
         summary: "none. The change, the percentage, and the total are all derived."
       },
       traps: [
-        "Formatting with `toFixed` and a hand-placed `$` breaks negatives and separators. Build one `formatUSD` helper first.",
+        "Formatting with `toFixed` and a hand-placed `$` breaks negatives and separators. Build one `formatMoney` helper first.",
         "Dividing by the previous balance without guarding zero.",
         "Rendering the Accounts card twice, once per tier, instead of moving one card with grid areas or `order`."
       ]

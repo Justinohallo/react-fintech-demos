@@ -41,6 +41,8 @@ The Coach also writes a **code review** of each attempt (`SPEC.md` §6): comment
 
 Mocks must match their Visual direction. After building a mock, take the screenshots described in `SPEC.md` §7, look at them, and fix what does not match before committing. Do not ask the human to look at a mock. They are practising against these designs and should not see them early.
 
+Mocks must also be code worth copying, because the human reads a mock after a rep as the answer. Before committing a mock, review its code the way the Coach reviews an attempt, against the guides and `SPEC.md` §2 **Reference code**, and fix anything that would score below 3. We follow our own best practices.
+
 ## Framework docs
 
 Next.js 16 differs from older versions, and its docs ship in `node_modules/next/dist/docs/`. Read the relevant guide there before writing Next.js code:
