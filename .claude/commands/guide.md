@@ -25,6 +25,10 @@ Read `CLAUDE.md` (the **Guides** paragraph), `SPEC.md` §5 (the method) and §6 
 - Draw on what came up in this conversation and in `reviews/`, but teach the general method.
 - Link other guides as `[Title](/guides/<slug>)`.
 
+## Check the mocks against it
+
+If the guide teaches a practice for code (it has a `code` field), check every built mock (`src/app/challenges/*/mock/page.tsx`) against it (`SPEC.md` §2 **Reference code**). List each mismatch for the human with its file and line. Fixing them is a separate Builder change, and it must keep each mock's check result and screenshots unchanged.
+
 ## Check and hand over
 
 Run `npm run build`, then show the human the new guide's path, its place in the curriculum (unit and order), and the tags it addresses. **Do not commit**; the human reviews first, then commits with a message starting `Guide:`.
