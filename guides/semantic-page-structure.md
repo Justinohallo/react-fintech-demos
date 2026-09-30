@@ -54,6 +54,47 @@ Which component each element lives in is covered in [Composing components](/guid
 
 Ids can't contain spaces and must be unique on the page. The same `id` can label both the section and its list.
 
+## When to name an element
+
+Two questions: **does it need a name**, and **where does the name come from**.
+
+### Does it need a name?
+
+| Kind of element | Needs a name? | Why |
+|---|---|---|
+| Text inside: `<button>`, `<a>`, headings, `<li>`, `<td>` | Already has one | Its text content is the name. "Pay now" names the button. |
+| Containers: `<section>`, `<nav>`, `<ul>`, `<table>`, `<form>`, `<aside>` | When someone has to pick this one out | A container can't be named by its content, so the name comes from outside. |
+| Layout wrappers: `<div>`, `<span>` | No | Having no meaning is their job. |
+
+Someone has to pick a container out when:
+
+- **There are several of the same kind.** Without names, a screen reader user hears "navigation, navigation" or "list, list, list".
+- **It's a `<section>`.** An unnamed section isn't exposed as a region landmark, so it behaves like a `div`. The name is what makes it a landmark.
+- **A test finds it by name.** `getByRole("list", { name: "Invoices" })` only matches a list with that name. AC wording like "a list named …" or "a region named …" tells you which ones.
+
+Don't name everything. A list that's the only one in its section, which nothing needs to find, is fine without a name. Extra names are noise, just as extra landmarks are.
+
+### Where does the name come from?
+
+Take the first that fits:
+
+1. **A native mechanism.** `<label htmlFor>` for inputs, `<caption>` for tables, `<legend>` for fieldsets, `alt` for images. No ARIA needed.
+2. **Visible text on the page.** Use `aria-labelledby`, pointing at that text's `id`. This is the usual case for sections and lists, because the heading above them already says what they are.
+3. **Nothing visible says it.** Use `aria-label="…"`: an icon-only button, `<nav aria-label="Main">`, an avatar with `role="img"`.
+
+Prefer visible text over `aria-label`. With `aria-labelledby`, what sighted users read and what screen reader users hear are the same words, so they can't drift apart.
+
+### The habit
+
+The pattern to spot is **a heading followed by the thing it describes**. When you type a heading, ask what it's the title of, give it an `id` right then, and point that element at it:
+
+```jsx
+<section aria-labelledby="invoices-heading">
+  <h2 id="invoices-heading">Invoices</h2>
+  <ul aria-labelledby="invoices-heading">…</ul>
+</section>
+```
+
 ## Text for things that are only visual
 
 | Visual | What assistive tech needs | Pattern |
