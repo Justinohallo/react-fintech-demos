@@ -30,10 +30,12 @@ In a timed rep, whatever you leave for "later" often never happens. The fix is n
 Two minutes, before any JSX:
 
 ```js
-const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
-const usdSigned = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", signDisplay: "always" });
-const formatUSD = (cents) => usd.format(cents / 100);
-const formatSignedUSD = (cents) => usdSigned.format(cents / 100);
+const money = (signDisplay) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", signDisplay });
+const plainMoney = money("auto");
+const signedMoney = money("always");
+const formatMoney = (cents) => plainMoney.format(cents / 100);
+const formatSignedMoney = (cents) => signedMoney.format(cents / 100);
 ```
 
 See [Props and money](/guides/props-and-money) for why each piece is there.

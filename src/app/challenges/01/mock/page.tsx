@@ -1,5 +1,5 @@
 import { Fraunces, Inter } from "next/font/google";
-import { formatChangePercent, formatDate, formatSignedUSD, formatUSD } from "./_lib/format";
+import { formatChangePercent, formatDate, formatSignedMoney, formatMoney } from "./_lib/format";
 
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -65,10 +65,10 @@ function BalanceCard({ account, className }: { account: Account; className: stri
           {account.name}
         </h1>
         <p className={`${fraunces.className} mt-4 text-4xl font-medium tracking-tight tabular-nums`}>
-          {formatUSD(account.balanceCents)}
+          {formatMoney(account.balanceCents)}
         </p>
         <p className={`mt-2 text-sm tabular-nums ${tone(changeCents)}`}>
-          {formatSignedUSD(changeCents)}
+          {formatSignedMoney(changeCents)}
           {changePercent && ` (${changePercent})`}
           <span className="text-stone-500"> vs last month</span>
         </p>
@@ -94,13 +94,13 @@ function AccountsCard({ accounts, className }: { accounts: AccountSummary[]; cla
           {accounts.map((a) => (
             <li key={a.id} className="flex items-center justify-between gap-4 py-3 first:pt-0">
               <span className="text-sm">{a.name}</span>
-              <span className="text-sm font-medium tabular-nums">{formatUSD(a.balanceCents)}</span>
+              <span className="text-sm font-medium tabular-nums">{formatMoney(a.balanceCents)}</span>
             </li>
           ))}
         </ul>
         <div className="flex items-center justify-between gap-4 border-t border-stone-200 pt-4">
           <span className="text-sm font-medium">Total</span>
-          <span className="text-sm font-medium tabular-nums">{formatUSD(totalCents)}</span>
+          <span className="text-sm font-medium tabular-nums">{formatMoney(totalCents)}</span>
         </div>
       </Card>
     </section>
@@ -117,7 +117,7 @@ function TransactionRow({ transaction: t }: { transaction: Transaction }) {
         </p>
       </div>
       <p className={`shrink-0 text-sm font-medium tabular-nums ${tone(t.amountCents)}`}>
-        {formatSignedUSD(t.amountCents)}
+        {formatSignedMoney(t.amountCents)}
       </p>
     </li>
   );

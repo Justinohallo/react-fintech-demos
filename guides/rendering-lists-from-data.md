@@ -54,7 +54,7 @@ Put each field in its own element, so it can be styled, aligned and read separat
     <p className="text-sm font-medium">{inv.customer}</p>
     <p className="text-xs text-slate-500">{inv.status} · {formatDate(inv.dueDate)}</p>
   </div>
-  <p className="text-sm tabular-nums">{formatUSD(inv.amountCents)}</p>
+  <p className="text-sm tabular-nums">{formatMoney(inv.amountCents)}</p>
 </li>
 ```
 
